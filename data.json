@@ -1,0 +1,12 @@
+{
+    "client_id_counter": 0,
+    "clients": [
+        {
+            "id": 0,
+            "nom": "Sylla",
+            "email": "Daouda"
+        }
+    ],
+    "salles": [],
+    "reservations": []
+}
