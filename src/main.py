@@ -8,6 +8,7 @@ salles = []
 reservations = []
 client_id_counter = 0  # Nouveau compteur pour les identifiants des clients
 
+
 # Ajouter un client
 def ajouter_client(nom, email):
     global clients, client_id_counter
@@ -17,6 +18,7 @@ def ajouter_client(nom, email):
     client_id_counter += 1  # Incrémente le compteur
     return client
 
+
 # Ajouter une salle
 def ajouter_salle(nom, type_salle, capacite):
     salle_id = str(uuid.uuid4())
@@ -24,9 +26,11 @@ def ajouter_salle(nom, type_salle, capacite):
     salles.append(salle)
     return salle
 
+
 # Afficher les salles disponibles
 def afficher_salles_disponibles():
     return [salle for salle in salles]
+
 
 # Réserver une salle
 def reserver_salle(client_id, salle_id, date_debut, date_fin):
@@ -41,9 +45,11 @@ def reserver_salle(client_id, salle_id, date_debut, date_fin):
     reservations.append(reservation)
     return reservation
 
+
 # Afficher les réservations d'un client
 def afficher_reservations_client(client_id):
     return [res for res in reservations if res["client_id"] == client_id]
+
 
 # Vérifier la disponibilité d'une salle
 def verifier_disponibilite_salle(salle_id, date_debut, date_fin):
@@ -54,6 +60,7 @@ def verifier_disponibilite_salle(salle_id, date_debut, date_fin):
             return False
     return True
 
+
 # Afficher les salles disponibles pour un créneau
 def afficher_salles_disponibles_pour_creneau(date_debut, date_fin):
     salles_disponibles = []
@@ -62,6 +69,7 @@ def afficher_salles_disponibles_pour_creneau(date_debut, date_fin):
             salles_disponibles.append(salle)
     return salles_disponibles
 
+
 # Supprimer un client
 def supprimer_client(client_id):
     global clients, reservations
@@ -69,12 +77,20 @@ def supprimer_client(client_id):
     reservations = [res for res in reservations if res["client_id"] != client_id]
     return f"Client {client_id} et ses réservations associées ont été supprimés."
 
+
 # Supprimer une salle
 def supprimer_salle(salle_id):
     global salles, reservations
     salles = [salle for salle in salles if salle["id"] != salle_id]
     reservations = [res for res in reservations if res["salle_id"] != salle_id]
     return f"Salle {salle_id} et ses réservations associées ont été supprimées."
+
+
+# Afficher les clients enregistrés
+def afficher_clients():
+    """Retourne une liste de clients enregistrés."""
+    return clients
+
 
 # Charger les données depuis un fichier JSON
 def charger_donnees(fichier):
@@ -90,16 +106,18 @@ def charger_donnees(fichier):
         clients, salles, reservations = [], [], []
         client_id_counter = 0
 
+
 # Sauvegarder les données dans un fichier JSON
 def sauvegarder_donnees(fichier):
     data = {
         "client_id_counter": client_id_counter,
         "clients": clients,
         "salles": salles,
-        "reservations": reservations
+        "reservations": reservations,
     }
     with open(fichier, "w") as f:
         json.dump(data, f, indent=4)
+
 
 # Valider les données d'entrée
 def valider_donnees(date_debut, date_fin):
