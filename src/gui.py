@@ -8,6 +8,7 @@ from main import (
     ajouter_salle,
     afficher_salles_disponibles,
     afficher_clients,
+    afficher_salles_disponibles_pour_creneau,
     charger_donnees,
     sauvegarder_donnees,
 )
@@ -267,8 +268,8 @@ def creer_section_reserver():
         f"{client['id']} - {client['nom']} ({client['email']})" for client in clients
     ]
 
-    def confirmer_reservation():
-        """Valide les entrées et effectue la réservation."""
+    def afficher_seconde_page():
+        """Affiche la seconde page avec les informations récapitulatives et les salles disponibles."""
         date_debut = entry_date_debut.get().strip()
         date_fin = entry_date_fin.get().strip()
         client_selection = client_var.get()
@@ -299,22 +300,75 @@ def creer_section_reserver():
             )
             return
 
-        # Extraire l'ID du client sélectionné
+        # Calcul de la durée
+        duree = (date_fin_obj - date_debut_obj).days * 24  # Durée en heures
         client_id = client_selection.split(" - ")[0]
+        client_nom = client_selection.split(" - ")[1].split(" (")[0]
 
-        # Effectuer la réservation (fonction à implémenter dans `main.py`)
-        messagebox.showinfo(
-            "Succès",
-            f"Réservation effectuée pour le client ID {client_id} du {date_debut} au {date_fin}.",
+        # Charger les salles disponibles
+        salles_disponibles = afficher_salles_disponibles_pour_creneau(
+            date_debut, date_fin
         )
 
-    # Boutons Valider et Annuler
+        # Afficher la seconde page
+        for widget in frame.winfo_children():
+            widget.destroy()
+
+        ttk.Label(
+            frame,
+            text="Informations de Réservation",
+            font=("Helvetica", 16, "bold"),
+            background="#f0f8ff",
+        ).pack(pady=10)
+
+        ttk.Label(
+            frame,
+            text=f"Client: {client_nom}\nDébut: {date_debut}\nFin: {date_fin}\nDurée: {duree}h",
+            background="#f0f8ff",
+        ).pack(pady=10)
+
+        # Liste des salles disponibles
+        ttk.Label(frame, text="Salles disponibles", background="#f0f8ff").pack(pady=5)
+        salle_var = tk.StringVar()
+        salle_menu = ttk.Combobox(
+            frame, textvariable=salle_var, state="readonly", width=37
+        )
+        salle_menu.pack(pady=5)
+        salle_menu["values"] = [
+            f"{salle['id']} - {salle['nom']} ({salle['type']})"
+            for salle in salles_disponibles
+        ]
+        if not salles_disponibles:
+            messagebox.showinfo(
+                "Aucune salle disponible",
+                "Aucune salle n'est disponible pour ce créneau. Veuillez choisir un autre créneau.",
+            )
+
+        # Boutons Valider et Annuler
+        button_frame = ttk.Frame(frame)
+        button_frame.pack(pady=20)
+        ttk.Button(
+            button_frame,
+            text="Valider",
+            command=lambda: messagebox.showinfo(
+                "Succès", f"Salle réservée : {salle_var.get()}"
+            ),
+            style="Accent.TButton",
+        ).pack(side=tk.LEFT, padx=10)
+        ttk.Button(
+            button_frame,
+            text="Annuler",
+            command=lambda: afficher_section(section_accueil),
+            style="Secondary.TButton",
+        ).pack(side=tk.LEFT, padx=10)
+
+    # Boutons Valider et Annuler pour la première page
     button_frame = ttk.Frame(frame)
     button_frame.pack(pady=20)
     ttk.Button(
         button_frame,
-        text="Valider",
-        command=confirmer_reservation,
+        text="Suivant",
+        command=afficher_seconde_page,
         style="Accent.TButton",
     ).pack(side=tk.LEFT, padx=10)
     ttk.Button(
