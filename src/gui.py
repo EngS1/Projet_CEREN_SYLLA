@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 from tkinter import ttk
+from tkcalendar import Calendar
 from main import (
     ajouter_client,
     ajouter_salle,
@@ -12,12 +13,15 @@ from main import (
     supprimer_client,
     supprimer_salle,
     charger_donnees,
-    sauvegarder_donnees
+    sauvegarder_donnees,
+    verifier_email
 )
 
 # Charger les données au démarrage
 fichier_donnees = "data.json"
 charger_donnees(fichier_donnees)
+
+
 
 def ajouter_client_gui():
     """Fenêtre pour ajouter un nouveau client."""
@@ -25,7 +29,13 @@ def ajouter_client_gui():
         """Valide les entrées et ajoute un client."""
         nom = entry_nom.get().strip()
         email = entry_email.get().strip()
-
+        # Vérification de l'email
+        est_valide, _ = verifier_email(email)
+        if not est_valide:
+            messagebox.showerror("Erreur", "Email invalide.")
+            return
+    
+        # Vérification des champs vides
         if not nom or not email:
             messagebox.showerror("Erreur", "Veuillez remplir tous les champs.")
             return
@@ -137,6 +147,57 @@ def verifier_disponibilite_salle_gui():
     entry_date_fin.pack()
     tk.Button(window, text="Vérifier", command=verifier).pack()
 
+def ouvrir_calendrier(entry, parent_window):
+    """Crée une fenêtre de sélection de créneau avec un calendrier et des heures."""
+    top = tk.Toplevel(parent_window)
+    top.title("Sélection du créneau")
+    top.geometry("400x500")
+    
+    # Frame principale
+    main_frame = ttk.Frame(top, padding=10)
+    main_frame.pack(expand=True, fill=tk.BOTH)
+    
+    # Calendrier
+    ttk.Label(main_frame, text="Sélectionnez la date:").pack(pady=5)
+    cal = Calendar(main_frame, selectmode='day', date_pattern='yyyy-mm-dd')
+    cal.pack(pady=10, fill=tk.X, padx=20)
+    
+    # Sélection de l'heure
+    ttk.Label(main_frame, text="Sélectionnez l'heure:").pack(pady=5)
+    frame_heure = ttk.Frame(main_frame)
+    frame_heure.pack(pady=10)
+    
+    # Heures (8h-19h)
+    ttk.Label(frame_heure, text="Heure:").pack(side=tk.LEFT)
+    heures = [f"{h:02d}" for h in range(8, 20)]
+    combo_heure = ttk.Combobox(frame_heure, values=heures, width=3)
+    combo_heure.pack(side=tk.LEFT, padx=5)
+    
+    # Minutes (par créneaux de 15 min)
+    ttk.Label(frame_heure, text="Min:").pack(side=tk.LEFT)
+    minutes = ["00", "15", "30", "45"]
+    combo_min = ttk.Combobox(frame_heure, values=minutes, width=3)
+    combo_min.pack(side=tk.LEFT)
+    
+    # Bouton Valider
+    btn_frame = ttk.Frame(main_frame)
+    btn_frame.pack(pady=20, fill=tk.X)
+    
+    def valider_creneau():
+        """Valide le créneau sélectionné."""
+        date = cal.get_date()
+        heure = combo_heure.get()
+        minute = combo_min.get()
+        
+        if heure and minute:
+            entry.delete(0, tk.END)
+            entry.insert(0, f"{date} {heure}:{minute}:00")
+            top.destroy()
+        else:
+            messagebox.showwarning("Attention", "Veuillez sélectionner une heure complète")
+    
+    ttk.Button(btn_frame, text="Valider ce créneau", command=valider_creneau).pack(side=tk.BOTTOM)
+
 def reserver_salle_gui():
     def confirmer():
         client_id = entry_client_id.get()
@@ -151,21 +212,35 @@ def reserver_salle_gui():
         else:
             messagebox.showerror("Erreur", "Veuillez remplir tous les champs.")
 
+    def ouvrir_calendrier_debut():
+        ouvrir_calendrier(entry_date_debut, window)
+
+    def ouvrir_calendrier_fin():
+        ouvrir_calendrier(entry_date_fin, window)
+
     window = tk.Toplevel()
     window.title("Réserver une Salle")
-    tk.Label(window, text="Identifiant du client").pack()
+    window.geometry("500x400")
+    
+    tk.Label(window, text="Identifiant du client").pack(pady=5)
     entry_client_id = tk.Entry(window)
-    entry_client_id.pack()
-    tk.Label(window, text="Identifiant de la salle").pack()
+    entry_client_id.pack(pady=5)
+    
+    tk.Label(window, text="Identifiant de la salle").pack(pady=5)
     entry_salle_id = tk.Entry(window)
-    entry_salle_id.pack()
-    tk.Label(window, text="Date de début (YYYY-MM-DD HH:MM)").pack()
+    entry_salle_id.pack(pady=5)
+    
+    tk.Label(window, text="Date de début").pack(pady=5)
     entry_date_debut = tk.Entry(window)
-    entry_date_debut.pack()
-    tk.Label(window, text="Date de fin (YYYY-MM-DD HH:MM)").pack()
+    entry_date_debut.pack(pady=5)
+    tk.Button(window, text="📅 Choisir", command=ouvrir_calendrier_debut).pack(pady=5)
+    
+    tk.Label(window, text="Date de fin").pack(pady=5)
     entry_date_fin = tk.Entry(window)
-    entry_date_fin.pack()
-    tk.Button(window, text="Confirmer", command=confirmer).pack()
+    entry_date_fin.pack(pady=5)
+    tk.Button(window, text="📅 Choisir", command=ouvrir_calendrier_fin).pack(pady=5)
+    
+    tk.Button(window, text="Confirmer", command=confirmer).pack(pady=20)
 
 def afficher_salles_disponibles_pour_creneau_gui():
     def rechercher():
@@ -224,7 +299,10 @@ def supprimer_salle_gui():
     entry_salle_id.pack(pady=5)
     tk.Button(window, text="Confirmer", command=confirmer, bg="red", fg="white").pack(pady=10)
 
+    
+
 def page_administrateur():
+    """Fenêtre principale pour l'administrateur."""
     def retour():
         admin_window.destroy()
         root.deiconify()  # Réaffiche la fenêtre principale
@@ -241,6 +319,10 @@ def page_administrateur():
     tk.Button(admin_window, text="Retour", command=retour, bg="red", fg="white", width=30).pack(pady=10)
 
 def page_client():
+    def retour():
+        client_window.destroy()
+        root.deiconify()  # Réaffiche la fenêtre principale
+        
     """Fenêtre principale pour les clients."""
     def consulter_reservations():
         """Affiche les réservations du client."""
@@ -269,7 +351,7 @@ def page_client():
     tk.Button(client_window, text="Réserver une salle", command=reserver, width=30).pack(pady=5)
 
     # Bouton pour fermer la fenêtre
-    tk.Button(client_window, text="Retour", command=client_window.destroy, bg="red", fg="white", width=30).pack(pady=10)
+    tk.Button(client_window, text="Retour", command=retour, bg="red", fg="white", width=30).pack(pady=10)
 
 def menu_principal():
     global root

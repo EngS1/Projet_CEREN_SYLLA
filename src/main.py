@@ -1,6 +1,8 @@
 import uuid
 import json
 from datetime import datetime
+from email_validator import validate_email, EmailNotValidError
+
 
 # Gestion des données
 clients = []
@@ -110,4 +112,14 @@ def valider_donnees(date_debut, date_fin):
             return False, "La date de début doit être antérieure à la date de fin."
         return True, None
     except ValueError:
-        return False, "Format de date invalide. Utilisez le format YYYY-MM-DDTHH:MM:SS."
+        return False, "Format de date invalide. Utilisez le format YYYY-MM-DD HH:MM:SS."
+
+# Fonction pour vérifier la validité de l'email
+def verifier_email(email):
+    try:
+        # Valider et normaliser l'email
+        v = validate_email(email)
+        return True, v.email  # Retourne True et l'email normalisé
+    except EmailNotValidError:
+        return False, "Email non valide"  # Retourne False et le message d'erreur
+
