@@ -1,0 +1,79 @@
+{
+    "client_id_counter": 3,
+    "clients": [
+        {
+            "id": 0,
+            "nom": "Sylla",
+            "email": "Daouda"
+        },
+        {
+            "id": 1,
+            "nom": "Muhammed",
+            "email": "Muhammed.ceren@gmail.co"
+        },
+        {
+            "id": 2,
+            "nom": "test",
+            "email": "test1@fr.com"
+        }
+    ],
+    "salles": [
+        {
+            "id": "c0427fd3-45aa-4b94-9811-7b93627a0d03",
+            "nom": "Salle standard B",
+            "type": "standard",
+            "capacite": 4
+        }
+    ],
+    "reservations": [
+        {
+            "id": "ff8020d2-b1d0-40f2-a9db-f0f1852266c7",
+            "client_id": "Muhammed",
+            "salle_id": "S1",
+            "date_debut": "2025-01-01 08:00",
+            "date_fin": "2024-01-01 08:60"
+        },
+        {
+            "id": "3e00792b-ae35-4fd9-be6e-c7ffabc0cdc9",
+            "client_id": "azf",
+            "salle_id": "asf",
+            "date_debut": "2025-05-14",
+            "date_fin": "2025-05-15 08:00"
+        },
+        {
+            "id": "5bb19757-aa0a-4fc7-850c-97d6f9d3b32e",
+            "client_id": "asd",
+            "salle_id": "asd",
+            "date_debut": "asd",
+            "date_fin": "asd"
+        },
+        {
+            "id": "82a469ce-ae14-46be-84e9-7f3112dd2b39",
+            "client_id": "asd",
+            "salle_id": "asd",
+            "date_debut": "2025-05-07",
+            "date_fin": "2025-05-07"
+        },
+        {
+            "id": "36a39ed4-7632-4359-951f-be943304c1a5",
+            "client_id": "asd",
+            "salle_id": "asd",
+            "date_debut": "2025-05-07",
+            "date_fin": "2025-05-07"
+        },
+        {
+            "id": "494eef2f-0810-4387-a79d-14c4c1309c0a",
+            "client_id": "asd",
+            "salle_id": "asd",
+            "date_debut": "2025-05-14 09:15:00",
+            "date_fin": "2025-05-06 10:15:00"
+        },
+        {
+            "id": "e88a0146-bd04-4d25-a61b-e7a820cf1f52",
+            "client_id": "asd",
+            "salle_id": "asd",
+            "date_debut": "2025-05-14 10:30:00",
+            "date_fin": "2025-05-14 11:00:00"
+        }
+    ]
+}
