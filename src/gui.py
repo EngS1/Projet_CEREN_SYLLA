@@ -209,11 +209,11 @@ def creer_section_reserver():
     ).pack(pady=10)
 
     # Sélection de la date de début
-    ttk.Label(frame, text="Date de début de réservation", background="#f0f8ff").pack(
-        pady=5
-    )
+    ttk.Label(frame, text="Date de début", background="#f0f8ff").pack(pady=5)
     entry_date_debut = ttk.Entry(frame, width=40)
     entry_date_debut.pack(pady=5)
+    error_date_debut = ttk.Label(frame, text="", foreground="red", background="#f0f8ff")
+    error_date_debut.pack()
 
     def ouvrir_calendrier_debut():
         """Ouvre un calendrier pour sélectionner la date de début."""
@@ -232,11 +232,11 @@ def creer_section_reserver():
     ttk.Button(frame, text="📅 Choisir", command=ouvrir_calendrier_debut).pack(pady=5)
 
     # Sélection de la date de fin
-    ttk.Label(frame, text="Date de fin de réservation", background="#f0f8ff").pack(
-        pady=5
-    )
+    ttk.Label(frame, text="Date de fin", background="#f0f8ff").pack(pady=5)
     entry_date_fin = ttk.Entry(frame, width=40)
     entry_date_fin.pack(pady=5)
+    error_date_fin = ttk.Label(frame, text="", foreground="red", background="#f0f8ff")
+    error_date_fin.pack()
 
     def ouvrir_calendrier_fin():
         """Ouvre un calendrier pour sélectionner la date de fin."""
@@ -254,128 +254,58 @@ def creer_section_reserver():
 
     ttk.Button(frame, text="📅 Choisir", command=ouvrir_calendrier_fin).pack(pady=5)
 
-    # Liste des clients enregistrés (menu déroulant)
-    ttk.Label(frame, text="Sélectionner un client", background="#f0f8ff").pack(pady=10)
-    client_var = tk.StringVar()
-    client_menu = ttk.Combobox(
-        frame, textvariable=client_var, state="readonly", width=37
+    # Sélection de l'heure de début
+    ttk.Label(frame, text="Heure de début (HH:MM)", background="#f0f8ff").pack(pady=5)
+    entry_heure_debut = ttk.Entry(frame, width=40)
+    entry_heure_debut.pack(pady=5)
+    error_heure_debut = ttk.Label(
+        frame, text="", foreground="red", background="#f0f8ff"
     )
-    client_menu.pack(pady=5)
+    error_heure_debut.pack()
 
-    # Charger les clients dans le menu déroulant
-    clients = afficher_clients()
-    client_menu["values"] = [
-        f"{client['id']} - {client['nom']} ({client['email']})" for client in clients
-    ]
+    # Sélection de l'heure de fin
+    ttk.Label(frame, text="Heure de fin (HH:MM)", background="#f0f8ff").pack(pady=5)
+    entry_heure_fin = ttk.Entry(frame, width=40)
+    entry_heure_fin.pack(pady=5)
+    error_heure_fin = ttk.Label(frame, text="", foreground="red", background="#f0f8ff")
+    error_heure_fin.pack()
 
-    def afficher_seconde_page():
-        """Affiche la seconde page avec les informations récapitulatives et les salles disponibles."""
-        date_debut = entry_date_debut.get().strip()
-        date_fin = entry_date_fin.get().strip()
-        client_selection = client_var.get()
+    # Liste des salles disponibles (menu déroulant)
+    ttk.Label(frame, text="Sélectionner une salle", background="#f0f8ff").pack(pady=10)
+    salle_var = tk.StringVar()
+    salle_menu = ttk.Combobox(frame, textvariable=salle_var, state="readonly", width=37)
+    salle_menu.pack(pady=5)
+    error_salle = ttk.Label(frame, text="", foreground="red", background="#f0f8ff")
+    error_salle.pack()
 
-        if not client_selection:
-            messagebox.showerror("Erreur", "Veuillez sélectionner un client.")
-            return
-
-        if not date_debut or not date_fin:
-            messagebox.showerror(
-                "Erreur", "Veuillez sélectionner les dates de réservation."
-            )
-            return
-
-        # Vérification des dates
-        try:
-            date_debut_obj = datetime.strptime(date_debut, "%Y-%m-%d")
-            date_fin_obj = datetime.strptime(date_fin, "%Y-%m-%d")
-            if date_debut_obj > date_fin_obj:
-                messagebox.showerror(
-                    "Erreur",
-                    "La date de début ne peut pas être supérieure à la date de fin.",
-                )
-                return
-        except ValueError:
-            messagebox.showerror(
-                "Erreur", "Format de date invalide. Utilisez le format YYYY-MM-DD."
-            )
-            return
-
-        # Calcul de la durée
-        duree = (date_fin_obj - date_debut_obj).days * 24  # Durée en heures
-        client_id = client_selection.split(" - ")[0]
-        client_nom = client_selection.split(" - ")[1].split(" (")[0]
-
-        # Charger les salles disponibles
-        salles_disponibles = afficher_salles_disponibles_pour_creneau(
-            date_debut, date_fin
-        )
-
-        # Afficher la seconde page
-        for widget in frame.winfo_children():
-            widget.destroy()
-
-        ttk.Label(
-            frame,
-            text="Informations de Réservation",
-            font=("Helvetica", 16, "bold"),
-            background="#f0f8ff",
-        ).pack(pady=10)
-
-        ttk.Label(
-            frame,
-            text=f"Client: {client_nom}\nDébut: {date_debut}\nFin: {date_fin}\nDurée: {duree}h",
-            background="#f0f8ff",
-        ).pack(pady=10)
-
-        # Liste des salles disponibles
-        ttk.Label(frame, text="Salles disponibles", background="#f0f8ff").pack(pady=5)
-        salle_var = tk.StringVar()
-        salle_menu = ttk.Combobox(
-            frame, textvariable=salle_var, state="readonly", width=37
-        )
-        salle_menu.pack(pady=5)
+    # Charger les salles disponibles
+    salles = afficher_salles_disponibles()
+    if not salles:
+        error_salle.config(text="Aucune salle disponible. Veuillez ajouter des salles.")
+    else:
         salle_menu["values"] = [
-            f"{salle['id']} - {salle['nom']} ({salle['type']})"
-            for salle in salles_disponibles
+            f"{salle['id']} - {salle['type']} (Capacité: {salle['capacite']})"
+            for salle in salles
         ]
-        if not salles_disponibles:
-            messagebox.showinfo(
-                "Aucune salle disponible",
-                "Aucune salle n'est disponible pour ce créneau. Veuillez choisir un autre créneau.",
-            )
 
-        # Boutons Valider et Annuler
-        button_frame = ttk.Frame(frame)
-        button_frame.pack(pady=20)
-        ttk.Button(
-            button_frame,
-            text="Valider",
-            command=lambda: messagebox.showinfo(
-                "Succès", f"Salle réservée : {salle_var.get()}"
-            ),
-            style="Accent.TButton",
-        ).pack(side=tk.LEFT, padx=10)
-        ttk.Button(
-            button_frame,
-            text="Annuler",
-            command=lambda: afficher_section(section_accueil),
-            style="Secondary.TButton",
-        ).pack(side=tk.LEFT, padx=10)
-
-    # Boutons Valider et Annuler pour la première page
+    # Boutons Valider et Annuler
     button_frame = ttk.Frame(frame)
     button_frame.pack(pady=20)
+
     ttk.Button(
         button_frame,
-        text="Suivant",
-        command=afficher_seconde_page,
+        text="Valider",
+        command=lambda: print("Valider la réservation"),  # Remplacez par votre logique
         style="Accent.TButton",
+        width=15,
     ).pack(side=tk.LEFT, padx=10)
+
     ttk.Button(
         button_frame,
         text="Annuler",
         command=lambda: afficher_section(section_accueil),
         style="Secondary.TButton",
+        width=15,
     ).pack(side=tk.LEFT, padx=10)
 
     return frame
@@ -409,7 +339,7 @@ def menu_principal():
 
     root = tk.Tk()
     root.title("MeetingPro - Accueil")
-    root.geometry("600x400")
+    root.geometry("800x600")
     root.resizable(False, False)
     root.configure(bg="#f0f8ff")
 
