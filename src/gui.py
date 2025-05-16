@@ -158,7 +158,7 @@ def creer_section_ajouter():
             if type_salle == "Standard" or type_salle == "Informatique":
                 capacite_var.set(min(4, capacite_var.get() + 1))
             elif type_salle == "Conférence":
-                capacite_var.set(min(10, capacite_var.get() + 1))
+                capacite_var.set(min(12, capacite_var.get() + 1))
 
         def decrementer_capacite():
             """Décrémente la capacité (minimum 1)."""
@@ -174,24 +174,46 @@ def creer_section_ajouter():
             side=tk.LEFT
         )
 
+        # Label pour afficher les erreurs
+        global error_label
+        error_label = ttk.Label(frame, text="", foreground="red", background="#e6f7ff")
+        error_label.pack(pady=5)
+
         def valider_salle():
             """Valide les entrées et ajoute une salle."""
             id_salle = entry_id_salle.get().strip()
             type_salle = type_salle_var.get()
             capacite = capacite_var.get()
 
+            # Réinitialiser le message d'erreur
+            error_label.config(text="")
+
+            # Vérification des champs
             if not id_salle or not type_salle:
-                messagebox.showerror("Erreur", "Veuillez remplir tous les champs.")
+                error_label.config(text="Veuillez remplir tous les champs.")
                 return
 
             # Vérification de l'unicité de l'identifiant
             salles_existantes = afficher_salles_disponibles()
             if any(salle["id"] == id_salle for salle in salles_existantes):
-                messagebox.showerror(
-                    "Erreur",
-                    "L'identifiant de la salle existe déjà. Veuillez en choisir un autre.",
+                error_label.config(
+                    text=f"L'identifiant '{id_salle}' existe déjà. Veuillez en choisir un autre."
                 )
                 return
+
+            # Vérification de la capacité maximale
+            if type_salle == "Standard" or type_salle == "Informatique":
+                if capacite > 4:
+                    error_label.config(
+                        text="La capacité maximale pour une salle Standard ou Informatique est de 4 personnes."
+                    )
+                    return
+            elif type_salle == "Conférence":
+                if capacite > 12:
+                    error_label.config(
+                        text="La capacité maximale pour une salle de Conférence est de 12 personnes."
+                    )
+                    return
 
             # Ajout de la salle
             salle = ajouter_salle(id_salle, type_salle, capacite)
