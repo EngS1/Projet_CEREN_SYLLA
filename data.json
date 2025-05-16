@@ -7,6 +7,19 @@
             "email": "Daouda"
         }
     ],
-    "salles": [],
+    "salles": [
+        {
+            "id": "90047a86-b9ec-4cfb-abab-7502fe963fa8",
+            "nom": "Salle1",
+            "type": "Standard",
+            "capacite": 4
+        },
+        {
+            "id": "6129de7c-546f-42c4-bba0-959696f1fe2f",
+            "nom": "Salle2",
+            "type": "Informatique",
+            "capacite": 6
+        }
+    ],
     "reservations": []
 }

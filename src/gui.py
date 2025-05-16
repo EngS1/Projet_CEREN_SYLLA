@@ -48,7 +48,7 @@ def creer_section_ajouter():
         entry_email = ttk.Entry(frame, width=40)
         entry_email.pack(pady=5)
 
-        def confirmer_client():
+        def valider_client():
             """Valide les entrées et ajoute un client."""
             nom = entry_nom.get().strip()
             email = entry_email.get().strip()
@@ -65,15 +65,25 @@ def creer_section_ajouter():
             )
             sauvegarder_donnees(fichier_donnees)
 
+        # Boutons Annuler et Valider
+        button_frame = ttk.Frame(frame)
+        button_frame.pack(pady=20)
+
         ttk.Button(
-            frame, text="Confirmer", command=confirmer_client, style="Accent.TButton"
-        ).pack(pady=10)
-        ttk.Button(
-            frame,
-            text="Retour",
+            button_frame,
+            text="Annuler",
             command=afficher_boutons_principaux,
             style="Secondary.TButton",
-        ).pack(pady=5)
+            width=15,
+        ).pack(side=tk.LEFT, padx=10)
+
+        ttk.Button(
+            button_frame,
+            text="Valider",
+            command=valider_client,
+            style="Accent.TButton",
+            width=15,
+        ).pack(side=tk.RIGHT, padx=10)
 
     def afficher_formulaire_salle():
         """Affiche le formulaire pour ajouter une salle."""
@@ -115,7 +125,7 @@ def creer_section_ajouter():
             if type_salle == "Standard" or type_salle == "Informatique":
                 capacite_var.set(min(4, capacite_var.get() + 1))
             elif type_salle == "Conférence":
-                capacite_var.set(min(10, capacite_var.get() + 1))
+                capacite_var.set(min(12, capacite_var.get() + 1))
 
         def decrementer_capacite():
             """Décrémente la capacité (minimum 1)."""
@@ -131,7 +141,7 @@ def creer_section_ajouter():
             side=tk.LEFT
         )
 
-        def confirmer_salle():
+        def valider_salle():
             """Valide les entrées et ajoute une salle."""
             id_salle = entry_id_salle.get().strip()
             type_salle = type_salle_var.get()
@@ -159,16 +169,25 @@ def creer_section_ajouter():
             sauvegarder_donnees(fichier_donnees)
             afficher_boutons_principaux()
 
-        # Boutons Valider et Annuler
+        # Boutons Annuler et Valider
+        button_frame = ttk.Frame(frame)
+        button_frame.pack(pady=20)
+
         ttk.Button(
-            frame, text="Valider", command=confirmer_salle, style="Accent.TButton"
-        ).pack(pady=10)
-        ttk.Button(
-            frame,
+            button_frame,
             text="Annuler",
             command=afficher_boutons_principaux,
             style="Secondary.TButton",
-        ).pack(pady=5)
+            width=15,
+        ).pack(side=tk.LEFT, padx=10)
+
+        ttk.Button(
+            button_frame,
+            text="Valider",
+            command=valider_salle,
+            style="Accent.TButton",
+            width=15,
+        ).pack(side=tk.RIGHT, padx=10)
 
     def afficher_boutons_principaux():
         """Affiche les boutons principaux de la section Ajouter."""
@@ -294,19 +313,19 @@ def creer_section_reserver():
 
     ttk.Button(
         button_frame,
-        text="Valider",
-        command=lambda: print("Valider la réservation"),  # Remplacez par votre logique
-        style="Accent.TButton",
-        width=15,
-    ).pack(side=tk.LEFT, padx=10)
-
-    ttk.Button(
-        button_frame,
         text="Annuler",
         command=lambda: afficher_section(section_accueil),
         style="Secondary.TButton",
         width=15,
     ).pack(side=tk.LEFT, padx=10)
+
+    ttk.Button(
+        button_frame,
+        text="Valider",
+        command=lambda: print("Valider la réservation"),  # Remplacez par votre logique
+        style="Accent.TButton",
+        width=15,
+    ).pack(side=tk.RIGHT, padx=10)
 
     return frame
 
