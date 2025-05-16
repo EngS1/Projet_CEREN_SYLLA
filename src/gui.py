@@ -12,6 +12,7 @@ from main import (
     charger_donnees,
     sauvegarder_donnees,
 )
+from controller import valider_et_ajouter_client
 
 # Charger les données au démarrage
 fichier_donnees = "data.json"
@@ -42,19 +43,19 @@ def creer_section_ajouter():
             background="#e6f7ff",
         ).pack(pady=20)
 
-        # Champ pour le prénom
-        ttk.Label(
-            frame, text="Prénom", background="#e6f7ff", font=("Helvetica", 12)
-        ).pack(pady=5)
-        entry_prenom = ttk.Entry(frame, width=50)
-        entry_prenom.pack(pady=10)
-
         # Champ pour le nom
         ttk.Label(frame, text="Nom", background="#e6f7ff", font=("Helvetica", 12)).pack(
             pady=5
         )
         entry_nom = ttk.Entry(frame, width=50)
         entry_nom.pack(pady=10)
+
+        # Champ pour le prénom
+        ttk.Label(
+            frame, text="Prénom", background="#e6f7ff", font=("Helvetica", 12)
+        ).pack(pady=5)
+        entry_prenom = ttk.Entry(frame, width=50)
+        entry_prenom.pack(pady=10)
 
         # Champ pour l'email
         ttk.Label(
@@ -63,21 +64,37 @@ def creer_section_ajouter():
         entry_email = ttk.Entry(frame, width=50)
         entry_email.pack(pady=10)
 
+        # Label pour afficher les erreurs
+        error_label = ttk.Label(frame, text="", foreground="red", background="#e6f7ff")
+        error_label.pack(pady=5)
+
         def valider_client():
             """Valide les entrées et ajoute un client."""
-            prenom = entry_prenom.get().strip()
             nom = entry_nom.get().strip()
+            prenom = entry_prenom.get().strip()
             email = entry_email.get().strip()
 
-            if not prenom or not nom or not email:
-                messagebox.showerror("Erreur", "Veuillez remplir tous les champs.")
+            # Réinitialiser le message d'erreur
+            error_label.config(text="")
+
+            # Vérification des champs
+            erreurs = []
+            if not nom.isalpha():
+                erreurs.append("Le nom doit contenir uniquement des lettres.")
+            if not prenom.isalpha():
+                erreurs.append("Le prénom doit contenir uniquement des lettres.")
+            if "@" not in email or "." not in email:
+                erreurs.append("Adresse email incorrecte.")
+
+            if erreurs:
+                error_label.config(text="Remplissez correctement les champs")
                 return
 
             # Ajout du client
             client = ajouter_client(prenom, nom, email)
             messagebox.showinfo(
                 "Succès",
-                f"Client ajouté avec succès :\nID: {client['id']}\nPrénom: {client['prenom']}\nNom: {client['nom']}\nEmail: {client['email']}",
+                f"Client ajouté avec succès :\nID: {client['id']}\nNom: {client['nom']}\nPrénom: {client['prenom']}\nEmail: {client['email']}",
             )
             sauvegarder_donnees(fichier_donnees)
 

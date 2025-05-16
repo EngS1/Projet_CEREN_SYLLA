@@ -1,10 +1,11 @@
 {
-    "client_id_counter": 0,
+    "client_id_counter": 1,
     "clients": [
         {
-            "id": 0,
-            "nom": "Sylla",
-            "email": "Daouda"
+            "id": 1,
+            "prenom": "Daouda",
+            "nom": "SYLLA",
+            "email": "daoudesylla@gmail.com"
         }
     ],
     "salles": [],
