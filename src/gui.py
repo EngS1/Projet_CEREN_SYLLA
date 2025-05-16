@@ -38,42 +38,68 @@ def creer_section_ajouter():
         ttk.Label(
             frame,
             text="Ajouter un Client",
-            font=("Helvetica", 16, "bold"),
-            background="#f0f8ff",
-        ).pack(pady=10)
-        ttk.Label(frame, text="Nom", background="#f0f8ff").pack(pady=5)
-        entry_nom = ttk.Entry(frame, width=40)
-        entry_nom.pack(pady=5)
-        ttk.Label(frame, text="Email", background="#f0f8ff").pack(pady=5)
-        entry_email = ttk.Entry(frame, width=40)
-        entry_email.pack(pady=5)
+            font=("Helvetica", 18, "bold"),
+            background="#e6f7ff",
+        ).pack(pady=20)
 
-        def confirmer_client():
+        # Champ pour le prénom
+        ttk.Label(
+            frame, text="Prénom", background="#e6f7ff", font=("Helvetica", 12)
+        ).pack(pady=5)
+        entry_prenom = ttk.Entry(frame, width=50)
+        entry_prenom.pack(pady=10)
+
+        # Champ pour le nom
+        ttk.Label(frame, text="Nom", background="#e6f7ff", font=("Helvetica", 12)).pack(
+            pady=5
+        )
+        entry_nom = ttk.Entry(frame, width=50)
+        entry_nom.pack(pady=10)
+
+        # Champ pour l'email
+        ttk.Label(
+            frame, text="Email", background="#e6f7ff", font=("Helvetica", 12)
+        ).pack(pady=5)
+        entry_email = ttk.Entry(frame, width=50)
+        entry_email.pack(pady=10)
+
+        def valider_client():
             """Valide les entrées et ajoute un client."""
+            prenom = entry_prenom.get().strip()
             nom = entry_nom.get().strip()
             email = entry_email.get().strip()
 
-            if not nom or not email:
+            if not prenom or not nom or not email:
                 messagebox.showerror("Erreur", "Veuillez remplir tous les champs.")
                 return
 
             # Ajout du client
-            client = ajouter_client(nom, email)
+            client = ajouter_client(prenom, nom, email)
             messagebox.showinfo(
                 "Succès",
-                f"Client ajouté avec succès :\nID: {client['id']}\nNom: {client['nom']}\nEmail: {client['email']}",
+                f"Client ajouté avec succès :\nID: {client['id']}\nPrénom: {client['prenom']}\nNom: {client['nom']}\nEmail: {client['email']}",
             )
             sauvegarder_donnees(fichier_donnees)
 
+        # Boutons Annuler et Valider sur la même ligne
+        button_frame = ttk.Frame(frame)
+        button_frame.pack(pady=15)
+
         ttk.Button(
-            frame, text="Confirmer", command=confirmer_client, style="Accent.TButton"
-        ).pack(pady=10)
-        ttk.Button(
-            frame,
-            text="Retour",
+            button_frame,
+            text="Annuler",
             command=afficher_boutons_principaux,
             style="Secondary.TButton",
-        ).pack(pady=5)
+            width=15,
+        ).pack(side=tk.LEFT, padx=10)
+
+        ttk.Button(
+            button_frame,
+            text="Valider",
+            command=valider_client,
+            style="Accent.TButton",
+            width=15,
+        ).pack(side=tk.LEFT, padx=10)
 
     def afficher_formulaire_salle():
         """Affiche le formulaire pour ajouter une salle."""
@@ -83,31 +109,31 @@ def creer_section_ajouter():
         ttk.Label(
             frame,
             text="Ajouter une Salle",
-            font=("Helvetica", 16, "bold"),
-            background="#f0f8ff",
-        ).pack(pady=10)
+            font=("Helvetica", 18, "bold"),
+            background="#e6f7ff",
+        ).pack(pady=20)
 
         # Champ pour l'identifiant de la salle
         ttk.Label(
-            frame, text="Identifiant de la salle (unique)", background="#f0f8ff"
+            frame, text="Identifiant de la salle (unique)", background="#e6f7ff"
         ).pack(pady=5)
-        entry_id_salle = ttk.Entry(frame, width=40)
-        entry_id_salle.pack(pady=5)
+        entry_id_salle = ttk.Entry(frame, width=50)
+        entry_id_salle.pack(pady=10)
 
         # Menu déroulant pour le type de salle
-        ttk.Label(frame, text="Type de salle", background="#f0f8ff").pack(pady=5)
+        ttk.Label(frame, text="Type de salle", background="#e6f7ff").pack(pady=5)
         type_salle_var = tk.StringVar()
         type_salle_menu = ttk.Combobox(
-            frame, textvariable=type_salle_var, state="readonly", width=37
+            frame, textvariable=type_salle_var, state="readonly", width=47
         )
         type_salle_menu["values"] = ["Standard", "Conférence", "Informatique"]
-        type_salle_menu.pack(pady=5)
+        type_salle_menu.pack(pady=10)
 
         # Champ pour la capacité (incrémentable)
-        ttk.Label(frame, text="Capacité", background="#f0f8ff").pack(pady=5)
+        ttk.Label(frame, text="Capacité", background="#e6f7ff").pack(pady=5)
         capacite_var = tk.IntVar(value=1)  # Capacité commence à 1
         frame_capacite = ttk.Frame(frame, style="TFrame")
-        frame_capacite.pack(pady=5)
+        frame_capacite.pack(pady=10)
 
         def incrementer_capacite():
             """Incrémente la capacité en fonction du type de salle."""
@@ -131,7 +157,7 @@ def creer_section_ajouter():
             side=tk.LEFT
         )
 
-        def confirmer_salle():
+        def valider_salle():
             """Valide les entrées et ajoute une salle."""
             id_salle = entry_id_salle.get().strip()
             type_salle = type_salle_var.get()
@@ -159,16 +185,25 @@ def creer_section_ajouter():
             sauvegarder_donnees(fichier_donnees)
             afficher_boutons_principaux()
 
-        # Boutons Valider et Annuler
+        # Boutons Annuler et Valider sur la même ligne
+        button_frame = ttk.Frame(frame)
+        button_frame.pack(pady=15)
+
         ttk.Button(
-            frame, text="Valider", command=confirmer_salle, style="Accent.TButton"
-        ).pack(pady=10)
-        ttk.Button(
-            frame,
+            button_frame,
             text="Annuler",
             command=afficher_boutons_principaux,
             style="Secondary.TButton",
-        ).pack(pady=5)
+            width=15,
+        ).pack(side=tk.LEFT, padx=10)
+
+        ttk.Button(
+            button_frame,
+            text="Valider",
+            command=valider_salle,
+            style="Accent.TButton",
+            width=15,
+        ).pack(side=tk.LEFT, padx=10)
 
     def afficher_boutons_principaux():
         """Affiche les boutons principaux de la section Ajouter."""
@@ -176,22 +211,25 @@ def creer_section_ajouter():
             widget.destroy()
 
         ttk.Label(
-            frame, text="Ajouter", font=("Helvetica", 16, "bold"), background="#f0f8ff"
-        ).pack(pady=10)
+            frame,
+            text="Ajouter",
+            font=("Helvetica", 18, "bold"),
+            background="#e6f7ff",
+        ).pack(pady=20)
         ttk.Button(
             frame,
             text="Ajouter nouveau client",
             command=afficher_formulaire_client,
             width=30,
             style="Accent.TButton",
-        ).pack(pady=10)
+        ).pack(pady=15)
         ttk.Button(
             frame,
             text="Ajouter nouvelle salle",
             command=afficher_formulaire_salle,
             width=30,
             style="Accent.TButton",
-        ).pack(pady=10)
+        ).pack(pady=15)
 
     afficher_boutons_principaux()
     return frame
@@ -302,7 +340,7 @@ def creer_section_reserver():
 
         # Calcul de la durée
         duree = (date_fin_obj - date_debut_obj).days * 24  # Durée en heures
-        client_id = client_selection.split(" - ")[0]
+
         client_nom = client_selection.split(" - ")[1].split(" (")[0]
 
         # Charger les salles disponibles
@@ -402,16 +440,32 @@ def creer_section_afficher():
     return frame
 
 
+def mettre_a_jour_bouton_actif(bouton):
+    """Met à jour la couleur du bouton actif."""
+    global active_button
+    if active_button:
+        active_button.configure(style="Accent.TButton")  # Réinitialiser l'ancien bouton
+    if bouton:  # Vérifie si le bouton n'est pas None
+        bouton.configure(
+            style="Active.TButton"
+        )  # Mettre à jour le style du bouton actif
+        active_button = bouton
+
+
 def menu_principal():
     """Fenêtre principale avec les sections dynamiques."""
     global root
-    global section_ajouter, section_reserver, section_afficher
+    global section_accueil, section_ajouter, section_reserver, section_afficher
+    global active_button  # Variable pour suivre le bouton actif
 
     root = tk.Tk()
     root.title("MeetingPro - Accueil")
     root.geometry("600x400")
     root.resizable(False, False)
     root.configure(bg="#f0f8ff")
+
+    # Initialisation de la variable active_button
+    active_button = None
 
     # Barre de navigation
     menu_bar = tk.Menu(root)
@@ -441,27 +495,42 @@ def menu_principal():
     # Boutons centraux
     button_frame = ttk.Frame(section_accueil, style="TFrame")
     button_frame.pack(pady=50)
-    ttk.Button(
+
+    bouton_ajouter = ttk.Button(
         button_frame,
         text="Ajouter",
-        command=lambda: afficher_section(section_ajouter),
+        command=lambda: [
+            afficher_section(section_ajouter),
+            mettre_a_jour_bouton_actif(bouton_ajouter),
+        ],
         width=20,
-        style="Accent.TButton",
-    ).pack(pady=10)
-    ttk.Button(
+        style="Green.TButton",
+    )
+    bouton_ajouter.pack(pady=10)
+
+    bouton_reserver = ttk.Button(
         button_frame,
         text="Réserver",
-        command=lambda: afficher_section(section_reserver),
+        command=lambda: [
+            afficher_section(section_reserver),
+            mettre_a_jour_bouton_actif(bouton_reserver),
+        ],
         width=20,
-        style="Accent.TButton",
-    ).pack(pady=10)
-    ttk.Button(
+        style="Orange.TButton",
+    )
+    bouton_reserver.pack(pady=10)
+
+    bouton_afficher = ttk.Button(
         button_frame,
         text="Afficher",
-        command=lambda: afficher_section(section_afficher),
+        command=lambda: [
+            afficher_section(section_afficher),
+            mettre_a_jour_bouton_actif(bouton_afficher),
+        ],
         width=20,
-        style="Accent.TButton",
-    ).pack(pady=10)
+        style="Purple.TButton",
+    )
+    bouton_afficher.pack(pady=10)
 
     # Sections dynamiques
     section_ajouter = creer_section_ajouter()
@@ -470,6 +539,7 @@ def menu_principal():
 
     # Afficher la section Accueil par défaut
     afficher_section(section_accueil)
+    mettre_a_jour_bouton_actif(None)  # Aucun bouton actif au départ
 
     root.mainloop()
 
