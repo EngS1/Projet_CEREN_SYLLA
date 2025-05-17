@@ -97,12 +97,16 @@ def creer_section_ajouter():
             background="#f0f8ff",
         ).pack(pady=10)
 
-        # Champ pour l'identifiant de la salle
-        ttk.Label(
-            frame, text="Identifiant de la salle (unique)", background="#f0f8ff"
-        ).pack(pady=5)
-        entry_id_salle = ttk.Entry(frame, width=40)
-        entry_id_salle.pack(pady=5)
+        # Champ pour le nom de la salle (utilisé comme ID)
+        ttk.Label(frame, text="Nom de la salle (unique)", background="#f0f8ff").pack(
+            pady=5
+        )
+        entry_nom_salle = ttk.Entry(frame, width=40)
+        entry_nom_salle.pack(pady=5)
+        error_nom_salle = ttk.Label(
+            frame, text="", foreground="red", background="#f0f8ff"
+        )
+        error_nom_salle.pack()
 
         # Menu déroulant pour le type de salle
         ttk.Label(frame, text="Type de salle", background="#f0f8ff").pack(pady=5)
@@ -112,6 +116,10 @@ def creer_section_ajouter():
         )
         type_salle_menu["values"] = ["Standard", "Conférence", "Informatique"]
         type_salle_menu.pack(pady=5)
+        error_type_salle = ttk.Label(
+            frame, text="", foreground="red", background="#f0f8ff"
+        )
+        error_type_salle.pack()
 
         # Champ pour la capacité (incrémentable)
         ttk.Label(frame, text="Capacité", background="#f0f8ff").pack(pady=5)
@@ -141,30 +149,50 @@ def creer_section_ajouter():
             side=tk.LEFT
         )
 
+        error_capacite = ttk.Label(
+            frame, text="", foreground="red", background="#f0f8ff"
+        )
+        error_capacite.pack()
+
         def valider_salle():
             """Valide les entrées et ajoute une salle."""
-            id_salle = entry_id_salle.get().strip()
+            nom_salle = entry_nom_salle.get().strip()  # Utilisé comme ID et nom
             type_salle = type_salle_var.get()
             capacite = capacite_var.get()
 
-            if not id_salle or not type_salle:
-                messagebox.showerror("Erreur", "Veuillez remplir tous les champs.")
+            # Réinitialiser les messages d'erreur
+            error_nom_salle.config(text="")
+            error_type_salle.config(text="")
+            error_capacite.config(text="")
+
+            # Vérification des champs
+            erreurs = False
+            if not nom_salle:
+                error_nom_salle.config(text="Veuillez entrer un nom de salle.")
+                erreurs = True
+            if not type_salle:
+                error_type_salle.config(text="Veuillez sélectionner un type de salle.")
+                erreurs = True
+            if capacite <= 0:
+                error_capacite.config(text="La capacité doit être supérieure à 0.")
+                erreurs = True
+
+            if erreurs:
                 return
 
-            # Vérification de l'unicité de l'identifiant
+            # Vérification de l'unicité du nom de la salle
             salles_existantes = afficher_salles_disponibles()
-            if any(salle["id"] == id_salle for salle in salles_existantes):
-                messagebox.showerror(
-                    "Erreur",
-                    "L'identifiant de la salle existe déjà. Veuillez en choisir un autre.",
+            if any(salle["id"] == nom_salle for salle in salles_existantes):
+                error_nom_salle.config(
+                    text=f"Le nom de la salle '{nom_salle}' existe déjà. Veuillez en choisir un autre."
                 )
                 return
 
-            # Ajout de la salle
-            salle = ajouter_salle(id_salle, type_salle, capacite)
+            # Ajout de la salle (ID et nom sont identiques)
+            salle = ajouter_salle(nom_salle, type_salle, capacite)
             messagebox.showinfo(
                 "Succès",
-                f"Salle ajoutée avec succès :\nID: {salle['id']}\nType: {salle['type']}\nCapacité: {salle['capacite']}",
+                f"Salle ajoutée avec succès :\nNom: {salle['id']}\nType: {salle['type']}\nCapacité: {salle['capacite']}",
             )
             sauvegarder_donnees(fichier_donnees)
             afficher_boutons_principaux()
@@ -241,12 +269,12 @@ def creer_section_reserver():
         cal = Calendar(top, selectmode="day", date_pattern="yyyy-mm-dd")
         cal.pack(pady=20)
 
-        def confirmer_date():
+        def valider_date():
             entry_date_debut.delete(0, tk.END)
             entry_date_debut.insert(0, cal.get_date())
             top.destroy()
 
-        ttk.Button(top, text="Confirmer", command=confirmer_date).pack(pady=10)
+        ttk.Button(top, text="Valider", command=valider_date).pack(pady=10)
 
     ttk.Button(frame, text="📅 Choisir", command=ouvrir_calendrier_debut).pack(pady=5)
 
@@ -264,12 +292,12 @@ def creer_section_reserver():
         cal = Calendar(top, selectmode="day", date_pattern="yyyy-mm-dd")
         cal.pack(pady=20)
 
-        def confirmer_date():
+        def valider_date():
             entry_date_fin.delete(0, tk.END)
             entry_date_fin.insert(0, cal.get_date())
             top.destroy()
 
-        ttk.Button(top, text="Confirmer", command=confirmer_date).pack(pady=10)
+        ttk.Button(top, text="Valider", command=valider_date).pack(pady=10)
 
     ttk.Button(frame, text="📅 Choisir", command=ouvrir_calendrier_fin).pack(pady=5)
 
@@ -290,22 +318,70 @@ def creer_section_reserver():
     error_heure_fin.pack()
 
     # Liste des salles disponibles (menu déroulant)
-    ttk.Label(frame, text="Sélectionner une salle", background="#f0f8ff").pack(pady=10)
+    ttk.Label(frame, text="Salles disponibles", background="#f0f8ff").pack(pady=10)
     salle_var = tk.StringVar()
-    salle_menu = ttk.Combobox(frame, textvariable=salle_var, state="readonly", width=37)
+    salle_menu = ttk.Combobox(frame, textvariable=salle_var, state="readonly", width=40)
     salle_menu.pack(pady=5)
     error_salle = ttk.Label(frame, text="", foreground="red", background="#f0f8ff")
     error_salle.pack()
 
-    # Charger les salles disponibles
-    salles = afficher_salles_disponibles()
-    if not salles:
-        error_salle.config(text="Aucune salle disponible. Veuillez ajouter des salles.")
-    else:
+    def charger_salles_disponibles():
+        """Charge les salles disponibles pour les créneaux choisis."""
+        date_debut = entry_date_debut.get().strip()
+        date_fin = entry_date_fin.get().strip()
+        heure_debut = entry_heure_debut.get().strip()
+        heure_fin = entry_heure_fin.get().strip()
+
+        # Réinitialiser les messages d'erreur
+        error_date_debut.config(text="")
+        error_date_fin.config(text="")
+        error_heure_debut.config(text="")
+        error_heure_fin.config(text="")
+        error_salle.config(text="")
+
+        # Vérification des champs
+        erreurs = False
+        if not date_debut:
+            error_date_debut.config(text="Veuillez sélectionner une date de début.")
+            erreurs = True
+        if not date_fin:
+            error_date_fin.config(text="Veuillez sélectionner une date de fin.")
+            erreurs = True
+        if not heure_debut:
+            error_heure_debut.config(text="Veuillez entrer une heure de début.")
+            erreurs = True
+        if not heure_fin:
+            error_heure_fin.config(text="Veuillez entrer une heure de fin.")
+            erreurs = True
+
+        if erreurs:
+            return
+
+        try:
+            heure_debut_obj = datetime.strptime(heure_debut, "%H:%M")
+            heure_fin_obj = datetime.strptime(heure_fin, "%H:%M")
+            if heure_debut_obj >= heure_fin_obj:
+                error_heure_fin.config(
+                    text="L'heure de fin doit être supérieure à l'heure de début."
+                )
+                return
+        except ValueError:
+            error_heure_debut.config(text="Format d'heure invalide (HH:MM).")
+            return
+
+        # Charger les salles disponibles
+        salles = afficher_salles_disponibles_pour_creneau(date_debut, date_fin)
         salle_menu["values"] = [
             f"{salle['id']} - {salle['type']} (Capacité: {salle['capacite']})"
             for salle in salles
         ]
+
+    ttk.Button(
+        frame,
+        text="Charger les salles",
+        command=charger_salles_disponibles,
+        style="Accent.TButton",
+    ).pack(pady=10)
 
     # Boutons Valider et Annuler
     button_frame = ttk.Frame(frame)
@@ -322,7 +398,7 @@ def creer_section_reserver():
     ttk.Button(
         button_frame,
         text="Valider",
-        command=lambda: print("Valider la réservation"),  # Remplacez par votre logique
+        command=lambda: print("Réservation validée"),  # Remplacez par votre logique
         style="Accent.TButton",
         width=15,
     ).pack(side=tk.RIGHT, padx=10)
@@ -354,11 +430,11 @@ def creer_section_afficher():
 def menu_principal():
     """Fenêtre principale avec les sections dynamiques."""
     global root
-    global section_ajouter, section_reserver, section_afficher
+    global section_ajouter, section_reserver, section_afficher, section_accueil
 
     root = tk.Tk()
     root.title("MeetingPro - Accueil")
-    root.geometry("800x600")
+    root.geometry("800x700")
     root.resizable(False, False)
     root.configure(bg="#f0f8ff")
 
