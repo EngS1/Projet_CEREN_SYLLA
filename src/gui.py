@@ -9,6 +9,7 @@ from main import (
     afficher_salles_disponibles,
     afficher_clients,
     afficher_salles_disponibles_pour_creneau,
+    afficher_reservations_client,
     charger_donnees,
     sauvegarder_donnees,
 )
@@ -412,19 +413,170 @@ def creer_section_afficher():
 
     ttk.Label(
         frame,
-        text="Salles Disponibles",
+        text="Afficher les Informations",
         font=("Helvetica", 16, "bold"),
         background="#f0f8ff",
+    ).pack(pady=20)
+
+    # Boutons centraux
+    button_frame = ttk.Frame(frame, style="TFrame")
+    button_frame.pack(pady=50)
+
+    # Bouton pour afficher la liste des salles
+    ttk.Button(
+        button_frame,
+        text="Afficher liste des salles",
+        command=afficher_liste_salles,
+        width=40,
+        style="Accent.TButton",
     ).pack(pady=10)
-    salles = afficher_salles_disponibles()
-    for salle in salles:
-        ttk.Label(
-            frame,
-            text=f"Nom: {salle['nom']}, Type: {salle['type']}, Capacité: {salle['capacite']}",
-            background="#f0f8ff",
-        ).pack(pady=5)
+
+    # Bouton pour afficher la liste des clients
+    ttk.Button(
+        button_frame,
+        text="Afficher liste des clients",
+        command=afficher_liste_clients,
+        width=40,
+        style="Accent.TButton",
+    ).pack(pady=10)
+
+    # Bouton pour afficher les salles disponibles pour un créneau
+    ttk.Button(
+        button_frame,
+        text="Afficher les salles disponibles pour un créneau",
+        command=afficher_salles_pour_creneau,
+        width=40,
+        style="Accent.TButton",
+    ).pack(pady=10)
+
+    # Bouton pour afficher les réservations pour un client
+    ttk.Button(
+        button_frame,
+        text="Afficher les réservations pour un client",
+        command=afficher_reservations_client,
+        width=40,
+        style="Accent.TButton",
+    ).pack(pady=10)
 
     return frame
+
+
+def afficher_salles_pour_creneau():
+    """Affiche les salles disponibles pour un créneau donné."""
+    top = tk.Toplevel(root)
+    top.title("Salles disponibles pour un créneau")
+    top.geometry("400x300")
+
+    ttk.Label(top, text="Date de début (YYYY-MM-DD):").pack(pady=5)
+    entry_date_debut = ttk.Entry(top, width=30)
+    entry_date_debut.pack(pady=5)
+
+    ttk.Label(top, text="Date de fin (YYYY-MM-DD):").pack(pady=5)
+    entry_date_fin = ttk.Entry(top, width=30)
+    entry_date_fin.pack(pady=5)
+
+    ttk.Label(top, text="Heure de début (HH:MM):").pack(pady=5)
+    entry_heure_debut = ttk.Entry(top, width=30)
+    entry_heure_debut.pack(pady=5)
+
+    ttk.Label(top, text="Heure de fin (HH:MM):").pack(pady=5)
+    entry_heure_fin = ttk.Entry(top, width=30)
+    entry_heure_fin.pack(pady=5)
+
+    def rechercher_salles():
+        date_debut = entry_date_debut.get().strip()
+        date_fin = entry_date_fin.get().strip()
+        heure_debut = entry_heure_debut.get().strip()
+        heure_fin = entry_heure_fin.get().strip()
+
+        try:
+            salles = afficher_salles_disponibles_pour_creneau(date_debut, date_fin)
+            if not salles:
+                messagebox.showinfo(
+                    "Résultat", "Aucune salle disponible pour ce créneau."
+                )
+                return
+
+            texte = "\n".join(
+                [
+                    f"Nom: {salle['id']}, Type: {salle['type']}, Capacité: {salle['capacite']}"
+                    for salle in salles
+                ]
+            )
+            messagebox.showinfo("Salles disponibles", texte)
+        except Exception as e:
+            messagebox.showerror("Erreur", f"Erreur lors de la recherche : {e}")
+
+    ttk.Button(top, text="Rechercher", command=rechercher_salles).pack(pady=10)
+
+
+def afficher_liste_salles():
+    """Affiche la liste des salles dans une fenêtre popup."""
+    salles = afficher_salles_disponibles()
+    if not salles:
+        messagebox.showinfo("Information", "Aucune salle disponible.")
+        return
+
+    texte = "\n".join(
+        [
+            f"Nom: {salle['id']}, Type: {salle['type']}, Capacité: {salle['capacite']}"
+            for salle in salles
+        ]
+    )
+    messagebox.showinfo("Liste des salles", texte)
+
+
+def afficher_liste_clients():
+    """Affiche la liste des clients dans une fenêtre popup."""
+    clients = afficher_clients()
+    if not clients:
+        messagebox.showinfo("Information", "Aucun client enregistré.")
+        return
+
+    texte = "\n".join(
+        [
+            f"ID: {client['id']}, Nom: {client['nom']}, Email: {client['email']}"
+            for client in clients
+        ]
+    )
+    messagebox.showinfo("Liste des clients", texte)
+
+
+def afficher_reservations_client():
+    """Affiche les réservations pour un client donné."""
+    top = tk.Toplevel(root)
+    top.title("Réservations pour un client")
+    top.geometry("400x200")
+
+    ttk.Label(top, text="ID du client:").pack(pady=5)
+    entry_client_id = ttk.Entry(top, width=30)
+    entry_client_id.pack(pady=5)
+
+    def rechercher_reservations():
+        client_id = entry_client_id.get().strip()
+        if not client_id:
+            messagebox.showerror("Erreur", "Veuillez entrer un ID de client.")
+            return
+
+        try:
+            reservations = afficher_reservations_client(client_id)
+            if not reservations:
+                messagebox.showinfo(
+                    "Résultat", "Aucune réservation trouvée pour ce client."
+                )
+                return
+
+            texte = "\n".join(
+                [
+                    f"Date: {res['date']}, Heure: {res['heure_debut']} - {res['heure_fin']}, Salle: {res['salle_id']}"
+                    for res in reservations
+                ]
+            )
+            messagebox.showinfo("Réservations", texte)
+        except Exception as e:
+            messagebox.showerror("Erreur", f"Erreur lors de la recherche : {e}")
+
+    ttk.Button(top, text="Rechercher", command=rechercher_reservations).pack(pady=10)
 
 
 def menu_principal():
