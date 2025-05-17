@@ -5,7 +5,6 @@ from tkcalendar import Calendar
 from datetime import datetime
 from main import (
     ajouter_client,
-    ajouter_salle,
     afficher_salles_disponibles,
     afficher_clients,
     afficher_salles_disponibles_pour_creneau,
@@ -13,10 +12,31 @@ from main import (
     charger_donnees,
     sauvegarder_donnees,
 )
+import json
+
 
 # Charger les données au démarrage
 fichier_donnees = "data.json"
 charger_donnees(fichier_donnees)
+
+
+def ajouter_salle(nom_salle, type_salle, capacite):
+    """Ajoute une salle dans la base de données."""
+    data = charger_donnees()  # Appel sans argument
+
+    # Vérification de l'unicité du nom de la salle
+    if any(salle["id"] == nom_salle for salle in data["salles"]):
+        raise ValueError(f"Le nom de la salle '{nom_salle}' existe déjà.")
+
+    nouvelle_salle = {
+        "id": nom_salle,  # L'ID est identique au nom
+        "nom": nom_salle,
+        "type": type_salle,
+        "capacite": capacite,
+    }
+    data["salles"].append(nouvelle_salle)
+    sauvegarder_donnees(data)  # Appel sans argument
+    return nouvelle_salle
 
 
 def afficher_section(frame):
@@ -178,6 +198,20 @@ def creer_section_ajouter():
                 error_capacite.config(text="La capacité doit être supérieure à 0.")
                 erreurs = True
 
+            # Limitation de la capacité en fonction du type de salle
+            if type_salle == "Standard" or type_salle == "Informatique":
+                if capacite > 4:
+                    error_capacite.config(
+                        text="La capacité maximale pour une salle Standard ou Informatique est de 4 personnes."
+                    )
+                    erreurs = True
+            elif type_salle == "Conférence":
+                if capacite > 12:
+                    error_capacite.config(
+                        text="La capacité maximale pour une salle de Conférence est de 12 personnes."
+                    )
+                    erreurs = True
+
             if erreurs:
                 return
 
@@ -230,14 +264,14 @@ def creer_section_ajouter():
             frame,
             text="Ajouter nouveau client",
             command=afficher_formulaire_client,
-            width=30,
+            width=35,  # Augmenté de 30 à 35
             style="Accent.TButton",
         ).pack(pady=10)
         ttk.Button(
             frame,
             text="Ajouter nouvelle salle",
             command=afficher_formulaire_salle,
-            width=30,
+            width=35,  # Augmenté de 30 à 35
             style="Accent.TButton",
         ).pack(pady=10)
 
@@ -277,7 +311,13 @@ def creer_section_reserver():
 
         ttk.Button(top, text="Valider", command=valider_date).pack(pady=10)
 
-    ttk.Button(frame, text="📅 Choisir", command=ouvrir_calendrier_debut).pack(pady=5)
+    ttk.Button(
+        frame,
+        text="📅 Choisir",
+        command=ouvrir_calendrier_debut,
+        width=20,  # Ajusté pour plus de lisibilité
+        style="Accent.TButton",
+    ).pack(pady=5)
 
     # Sélection de la date de fin
     ttk.Label(frame, text="Date de fin", background="#f0f8ff").pack(pady=5)
@@ -300,7 +340,13 @@ def creer_section_reserver():
 
         ttk.Button(top, text="Valider", command=valider_date).pack(pady=10)
 
-    ttk.Button(frame, text="📅 Choisir", command=ouvrir_calendrier_fin).pack(pady=5)
+    ttk.Button(
+        frame,
+        text="📅 Choisir",
+        command=ouvrir_calendrier_fin,
+        width=20,  # Ajusté pour plus de lisibilité
+        style="Accent.TButton",
+    ).pack(pady=5)
 
     # Sélection de l'heure de début
     ttk.Label(frame, text="Heure de début (HH:MM)", background="#f0f8ff").pack(pady=5)
@@ -381,6 +427,7 @@ def creer_section_reserver():
         frame,
         text="Charger les salles",
         command=charger_salles_disponibles,
+        width=25,  # Augmenté pour plus de lisibilité
         style="Accent.TButton",
     ).pack(pady=10)
 
@@ -393,15 +440,15 @@ def creer_section_reserver():
         text="Annuler",
         command=lambda: afficher_section(section_accueil),
         style="Secondary.TButton",
-        width=15,
+        width=20,  # Augmenté pour plus de lisibilité
     ).pack(side=tk.LEFT, padx=10)
 
     ttk.Button(
         button_frame,
         text="Valider",
-        command=lambda: print("Réservation validée"),  # Remplacez par votre logique
+        command=lambda: print("Réservation validée"),
         style="Accent.TButton",
-        width=15,
+        width=20,  # Augmenté pour plus de lisibilité
     ).pack(side=tk.RIGHT, padx=10)
 
     return frame
@@ -427,7 +474,7 @@ def creer_section_afficher():
         button_frame,
         text="Afficher liste des salles",
         command=afficher_liste_salles,
-        width=40,
+        width=45,  # Augmenté de 40 à 45
         style="Accent.TButton",
     ).pack(pady=10)
 
@@ -436,7 +483,7 @@ def creer_section_afficher():
         button_frame,
         text="Afficher liste des clients",
         command=afficher_liste_clients,
-        width=40,
+        width=45,  # Augmenté de 40 à 45
         style="Accent.TButton",
     ).pack(pady=10)
 
@@ -445,7 +492,7 @@ def creer_section_afficher():
         button_frame,
         text="Afficher les salles disponibles pour un créneau",
         command=afficher_salles_pour_creneau,
-        width=40,
+        width=45,  # Augmenté de 40 à 45
         style="Accent.TButton",
     ).pack(pady=10)
 
@@ -454,7 +501,7 @@ def creer_section_afficher():
         button_frame,
         text="Afficher les réservations pour un client",
         command=afficher_reservations_client,
-        width=40,
+        width=45,  # Augmenté de 40 à 45
         style="Accent.TButton",
     ).pack(pady=10)
 
