@@ -309,57 +309,142 @@ def creer_section_reserver():
 
     def afficher_confirmation():
         """Affiche la page de confirmation dans le même écran."""
+        # Sauvegarder les valeurs des champs avant de détruire les widgets
+        client_nom = client_var.get()
+        date_debut = entry_date_debut.get()
+        heure_debut = entry_heure_debut.get()
+        date_fin = entry_date_fin.get()
+        heure_fin = entry_heure_fin.get()
+
+        # Calcul de la durée
+        try:
+            datetime_debut = datetime.strptime(
+                f"{date_debut} {heure_debut}", "%Y-%m-%d %H:%M"
+            )
+            datetime_fin = datetime.strptime(
+                f"{date_fin} {heure_fin}", "%Y-%m-%d %H:%M"
+            )
+            duree = datetime_fin - datetime_debut
+            duree_heures = duree.total_seconds() // 3600
+        except Exception:
+            duree_heures = "Inconnue"
+
+        # Détruire les widgets existants
         for widget in frame.winfo_children():
             widget.destroy()
 
+        # Afficher les informations de confirmation
         ttk.Label(
             frame,
-            text="Confirmation de la Réservation",
+            text="Réserver une Salle",
             font=("Helvetica", 16, "bold"),
             background="#f0f8ff",
+            anchor="center",
         ).pack(pady=10)
 
         ttk.Label(
             frame,
-            text=f"Date de début : {entry_date_debut.get()} {entry_heure_debut.get()}",
+            text=f"Client: {client_nom}",
+            background="#f0f8ff",
+            font=("Helvetica", 12),
+            anchor="center",
         ).pack(pady=5)
         ttk.Label(
-            frame, text=f"Date de fin : {entry_date_fin.get()} {entry_heure_fin.get()}"
+            frame,
+            text=f"Début: {date_debut} {heure_debut}",
+            background="#f0f8ff",
+            font=("Helvetica", 12),
+            anchor="center",
         ).pack(pady=5)
-        ttk.Label(frame, text=f"Client : {client_var.get()}").pack(pady=5)
+        ttk.Label(
+            frame,
+            text=f"Fin: {date_fin} {heure_fin}",
+            background="#f0f8ff",
+            font=("Helvetica", 12),
+            anchor="center",
+        ).pack(pady=5)
+        ttk.Label(
+            frame,
+            text=f"Durée: {duree_heures}h",
+            background="#f0f8ff",
+            font=("Helvetica", 12),
+            anchor="center",
+        ).pack(pady=5)
 
-        # Liste des salles disponibles
-        ttk.Label(
-            frame, text="Salles disponibles", font=("Helvetica", 12, "bold")
-        ).pack(pady=10)
-        salles = afficher_salles_disponibles_pour_creneau(
-            entry_date_debut.get(), entry_date_fin.get()
+        # Conteneur pour la sélection des salles et types
+        frame_salles = ttk.Frame(frame, style="TFrame")
+        frame_salles.pack(pady=10, padx=20, fill=tk.X)
+
+        # Texte "Salle disponible" au-dessus de la case
+        ttk.Label(frame_salles, text="Salle disponible:", background="#f0f8ff").grid(
+            row=0, column=0, padx=5, pady=5, sticky=tk.W, columnspan=2
         )
-        for salle in salles:
-            ttk.Checkbutton(
-                frame,
-                text=f"{salle['id']} - {salle['type']} (Capacité: {salle['capacite']})",
-            ).pack(anchor="w")
+        salle_disponible_var = tk.StringVar()
+        salle_disponible_menu = ttk.Combobox(
+            frame_salles,
+            textvariable=salle_disponible_var,
+            state="readonly",
+            width=30,
+        )
+        salle_disponible_menu.grid(row=1, column=0, padx=5, pady=5, columnspan=2)
 
-        # Boutons Annuler et Valider
+        # Texte "Type de salle" au-dessus de la case
+        ttk.Label(frame_salles, text="Type de salle:", background="#f0f8ff").grid(
+            row=0, column=2, padx=5, pady=5, sticky=tk.W, columnspan=2
+        )
+        salle_type_var = tk.StringVar()
+        salle_type_var.set("Standard")  # Valeur par défaut
+        salle_type_menu = ttk.Combobox(
+            frame_salles,
+            textvariable=salle_type_var,
+            state="readonly",
+            values=["Standard", "Conférence", "Informatique"],
+            width=20,
+        )
+        salle_type_menu.grid(row=1, column=2, padx=5, pady=5, columnspan=2)
+
+        def mettre_a_jour_salles():
+            """Met à jour la liste des salles disponibles en fonction du type sélectionné."""
+            type_salle = salle_type_var.get()
+            salles = afficher_salles_disponibles_pour_creneau(date_debut, date_fin)
+            salles_filtrees = [
+                salle["id"] for salle in salles if salle["type"] == type_salle
+            ]
+            salle_disponible_menu["values"] = salles_filtrees
+            if salles_filtrees:
+                salle_disponible_var.set(
+                    salles_filtrees[0]
+                )  # Sélectionner la première salle
+            else:
+                salle_disponible_var.set("")  # Réinitialiser si aucune salle disponible
+
+        # Mettre à jour les salles disponibles lorsque le type de salle change
+        salle_type_menu.bind("<<ComboboxSelected>>", lambda e: mettre_a_jour_salles())
+
+        # Boutons Annuler et Valider rapprochés au centre
         button_frame = ttk.Frame(frame)
-        button_frame.pack(pady=20, fill=tk.X)
+        button_frame.pack(pady=20)
 
         ttk.Button(
             button_frame,
             text="Annuler",
-            command=lambda: afficher_section(section_reserver),
+            command=lambda: afficher_section(
+                section_reserver
+            ),  # Retour à la première page
             style="Secondary.TButton",
             width=15,
-        ).pack(side=tk.LEFT, padx=10)
+        ).pack(side=tk.LEFT, padx=20)
 
         ttk.Button(
             button_frame,
             text="Valider",
-            command=lambda: messagebox.showinfo("Succès", "Réservation confirmée !"),
+            command=lambda: messagebox.showinfo(
+                "Succès",
+                f"Réservation confirmée pour la salle {salle_disponible_var.get()} !",
+            ),
             style="Accent.TButton",
             width=15,
-        ).pack(side=tk.RIGHT, padx=10)
+        ).pack(side=tk.LEFT, padx=20)
 
     ttk.Label(
         frame,
