@@ -62,27 +62,59 @@ def creer_section_ajouter():
             font=("Helvetica", 16, "bold"),
             background="#f0f8ff",
         ).pack(pady=10)
+
+        # Champ pour le nom
         ttk.Label(frame, text="Nom", background="#f0f8ff").pack(pady=5)
         entry_nom = ttk.Entry(frame, width=40)
         entry_nom.pack(pady=5)
+        error_nom = ttk.Label(frame, text="", foreground="red", background="#f0f8ff")
+        error_nom.pack()
+
+        # Champ pour le prénom
+        ttk.Label(frame, text="Prénom", background="#f0f8ff").pack(pady=5)
+        entry_prenom = ttk.Entry(frame, width=40)
+        entry_prenom.pack(pady=5)
+        error_prenom = ttk.Label(frame, text="", foreground="red", background="#f0f8ff")
+        error_prenom.pack()
+
+        # Champ pour l'email
         ttk.Label(frame, text="Email", background="#f0f8ff").pack(pady=5)
         entry_email = ttk.Entry(frame, width=40)
         entry_email.pack(pady=5)
+        error_email = ttk.Label(frame, text="", foreground="red", background="#f0f8ff")
+        error_email.pack()
 
         def valider_client():
             """Valide les entrées et ajoute un client."""
             nom = entry_nom.get().strip()
+            prenom = entry_prenom.get().strip()
             email = entry_email.get().strip()
 
-            if not nom or not email:
-                messagebox.showerror("Erreur", "Veuillez remplir tous les champs.")
+            # Réinitialiser les messages d'erreur
+            error_nom.config(text="")
+            error_prenom.config(text="")
+            error_email.config(text="")
+
+            # Validation des champs
+            erreurs = False
+            if not nom:
+                error_nom.config(text="Erreur : Veuillez entrer un nom.")
+                erreurs = True
+            if not prenom:
+                error_prenom.config(text="Erreur : Veuillez entrer un prénom.")
+                erreurs = True
+            if not email or "@" not in email or "." not in email:
+                error_email.config(text="Erreur : Entrez une adresse email correcte.")
+                erreurs = True
+
+            if erreurs:
                 return
 
             # Ajout du client
-            client = ajouter_client(nom, email)
+            client = ajouter_client(prenom, nom, email)
             messagebox.showinfo(
                 "Succès",
-                f"Client ajouté avec succès :\nID: {client['id']}\nNom: {client['nom']}\nEmail: {client['email']}",
+                f"Client ajouté avec succès :\nID: {client['id']}\nNom: {client['nom']}\nPrénom: {client['prenom']}\nEmail: {client['email']}",
             )
             sauvegarder_donnees(fichier_donnees)
 
@@ -188,42 +220,34 @@ def creer_section_ajouter():
 
             # Vérification des champs
             erreurs = False
-            if not nom_salle:
-                error_nom_salle.config(text="Veuillez entrer un nom de salle.")
+            if not nom_salle or not nom_salle.isalnum():
+                error_nom_salle.config(
+                    text="Erreur : L'identifiant doit être un nom ou un numéro valide."
+                )
                 erreurs = True
             if not type_salle:
-                error_type_salle.config(text="Veuillez sélectionner un type de salle.")
+                error_type_salle.config(
+                    text="Erreur : Veuillez sélectionner un type de salle."
+                )
                 erreurs = True
             if capacite <= 0:
-                error_capacite.config(text="La capacité doit être supérieure à 0.")
+                error_capacite.config(
+                    text="Erreur : La capacité doit être supérieure à 0."
+                )
                 erreurs = True
 
-            # Limitation de la capacité en fonction du type de salle
-            if type_salle == "Standard" or type_salle == "Informatique":
-                if capacite > 4:
-                    error_capacite.config(
-                        text="La capacité maximale pour une salle Standard ou Informatique est de 4 personnes."
-                    )
-                    erreurs = True
-            elif type_salle == "Conférence":
-                if capacite > 12:
-                    error_capacite.config(
-                        text="La capacité maximale pour une salle de Conférence est de 12 personnes."
-                    )
-                    erreurs = True
+            # Vérification de l'unicité de l'identifiant
+            salles_existantes = afficher_salles_disponibles()
+            if any(salle["id"] == nom_salle for salle in salles_existantes):
+                error_nom_salle.config(
+                    text=f"Erreur : L'identifiant '{nom_salle}' existe déjà. Veuillez en choisir un autre."
+                )
+                erreurs = True
 
             if erreurs:
                 return
 
-            # Vérification de l'unicité du nom de la salle
-            salles_existantes = afficher_salles_disponibles()
-            if any(salle["id"] == nom_salle for salle in salles_existantes):
-                error_nom_salle.config(
-                    text=f"Le nom de la salle '{nom_salle}' existe déjà. Veuillez en choisir un autre."
-                )
-                return
-
-            # Ajout de la salle (ID et nom sont identiques)
+            # Ajout de la salle
             salle = ajouter_salle(nom_salle, type_salle, capacite)
             messagebox.showinfo(
                 "Succès",
@@ -283,153 +307,125 @@ def creer_section_reserver():
     """Crée la section Réserver."""
     frame = ttk.Frame(root, style="TFrame")
 
+    def afficher_confirmation():
+        """Affiche la page de confirmation dans le même écran."""
+        for widget in frame.winfo_children():
+            widget.destroy()
+
+        ttk.Label(
+            frame,
+            text="Confirmation de la Réservation",
+            font=("Helvetica", 16, "bold"),
+            background="#f0f8ff",
+        ).pack(pady=10)
+
+        ttk.Label(
+            frame,
+            text=f"Date de début : {entry_date_debut.get()} {entry_heure_debut.get()}",
+        ).pack(pady=5)
+        ttk.Label(
+            frame, text=f"Date de fin : {entry_date_fin.get()} {entry_heure_fin.get()}"
+        ).pack(pady=5)
+        ttk.Label(frame, text=f"Client : {client_var.get()}").pack(pady=5)
+
+        # Liste des salles disponibles
+        ttk.Label(
+            frame, text="Salles disponibles", font=("Helvetica", 12, "bold")
+        ).pack(pady=10)
+        salles = afficher_salles_disponibles_pour_creneau(
+            entry_date_debut.get(), entry_date_fin.get()
+        )
+        for salle in salles:
+            ttk.Checkbutton(
+                frame,
+                text=f"{salle['id']} - {salle['type']} (Capacité: {salle['capacite']})",
+            ).pack(anchor="w")
+
+        # Boutons Annuler et Valider
+        button_frame = ttk.Frame(frame)
+        button_frame.pack(pady=20, fill=tk.X)
+
+        ttk.Button(
+            button_frame,
+            text="Annuler",
+            command=lambda: afficher_section(section_reserver),
+            style="Secondary.TButton",
+            width=15,
+        ).pack(side=tk.LEFT, padx=10)
+
+        ttk.Button(
+            button_frame,
+            text="Valider",
+            command=lambda: messagebox.showinfo("Succès", "Réservation confirmée !"),
+            style="Accent.TButton",
+            width=15,
+        ).pack(side=tk.RIGHT, padx=10)
+
     ttk.Label(
         frame,
         text="Réserver une Salle",
         font=("Helvetica", 16, "bold"),
         background="#f0f8ff",
+        anchor="center",
     ).pack(pady=10)
 
-    # Sélection de la date de début
-    ttk.Label(frame, text="Date de début", background="#f0f8ff").pack(pady=5)
-    entry_date_debut = ttk.Entry(frame, width=40)
-    entry_date_debut.pack(pady=5)
-    error_date_debut = ttk.Label(frame, text="", foreground="red", background="#f0f8ff")
-    error_date_debut.pack()
-
-    def ouvrir_calendrier_debut():
-        """Ouvre un calendrier pour sélectionner la date de début."""
-        top = tk.Toplevel(root)
-        top.title("Sélectionner la date de début")
-        cal = Calendar(top, selectmode="day", date_pattern="yyyy-mm-dd")
-        cal.pack(pady=20)
-
-        def valider_date():
-            entry_date_debut.delete(0, tk.END)
-            entry_date_debut.insert(0, cal.get_date())
-            top.destroy()
-
-        ttk.Button(top, text="Valider", command=valider_date).pack(pady=10)
-
-    ttk.Button(
-        frame,
-        text="📅 Choisir",
-        command=ouvrir_calendrier_debut,
-        width=20,  # Ajusté pour plus de lisibilité
-        style="Accent.TButton",
-    ).pack(pady=5)
-
-    # Sélection de la date de fin
-    ttk.Label(frame, text="Date de fin", background="#f0f8ff").pack(pady=5)
-    entry_date_fin = ttk.Entry(frame, width=40)
-    entry_date_fin.pack(pady=5)
-    error_date_fin = ttk.Label(frame, text="", foreground="red", background="#f0f8ff")
-    error_date_fin.pack()
-
-    def ouvrir_calendrier_fin():
-        """Ouvre un calendrier pour sélectionner la date de fin."""
-        top = tk.Toplevel(root)
-        top.title("Sélectionner la date de fin")
-        cal = Calendar(top, selectmode="day", date_pattern="yyyy-mm-dd")
-        cal.pack(pady=20)
-
-        def valider_date():
-            entry_date_fin.delete(0, tk.END)
-            entry_date_fin.insert(0, cal.get_date())
-            top.destroy()
-
-        ttk.Button(top, text="Valider", command=valider_date).pack(pady=10)
-
-    ttk.Button(
-        frame,
-        text="📅 Choisir",
-        command=ouvrir_calendrier_fin,
-        width=20,  # Ajusté pour plus de lisibilité
-        style="Accent.TButton",
-    ).pack(pady=5)
-
-    # Sélection de l'heure de début
-    ttk.Label(frame, text="Heure de début (HH:MM)", background="#f0f8ff").pack(pady=5)
-    entry_heure_debut = ttk.Entry(frame, width=40)
-    entry_heure_debut.pack(pady=5)
-    error_heure_debut = ttk.Label(
-        frame, text="", foreground="red", background="#f0f8ff"
+    # Conteneur pour la date et l'heure de début
+    frame_debut = ttk.Frame(frame, style="TFrame")
+    frame_debut.pack(pady=10)
+    ttk.Label(frame_debut, text="Date de début", background="#f0f8ff").pack(
+        anchor="center", pady=5
     )
-    error_heure_debut.pack()
-
-    # Sélection de l'heure de fin
-    ttk.Label(frame, text="Heure de fin (HH:MM)", background="#f0f8ff").pack(pady=5)
-    entry_heure_fin = ttk.Entry(frame, width=40)
-    entry_heure_fin.pack(pady=5)
-    error_heure_fin = ttk.Label(frame, text="", foreground="red", background="#f0f8ff")
-    error_heure_fin.pack()
-
-    # Liste des salles disponibles (menu déroulant)
-    ttk.Label(frame, text="Salles disponibles", background="#f0f8ff").pack(pady=10)
-    salle_var = tk.StringVar()
-    salle_menu = ttk.Combobox(frame, textvariable=salle_var, state="readonly", width=40)
-    salle_menu.pack(pady=5)
-    error_salle = ttk.Label(frame, text="", foreground="red", background="#f0f8ff")
-    error_salle.pack()
-
-    def charger_salles_disponibles():
-        """Charge les salles disponibles pour les créneaux choisis."""
-        date_debut = entry_date_debut.get().strip()
-        date_fin = entry_date_fin.get().strip()
-        heure_debut = entry_heure_debut.get().strip()
-        heure_fin = entry_heure_fin.get().strip()
-
-        # Réinitialiser les messages d'erreur
-        error_date_debut.config(text="")
-        error_date_fin.config(text="")
-        error_heure_debut.config(text="")
-        error_heure_fin.config(text="")
-        error_salle.config(text="")
-
-        # Vérification des champs
-        erreurs = False
-        if not date_debut:
-            error_date_debut.config(text="Veuillez sélectionner une date de début.")
-            erreurs = True
-        if not date_fin:
-            error_date_fin.config(text="Veuillez sélectionner une date de fin.")
-            erreurs = True
-        if not heure_debut:
-            error_heure_debut.config(text="Veuillez entrer une heure de début.")
-            erreurs = True
-        if not heure_fin:
-            error_heure_fin.config(text="Veuillez entrer une heure de fin.")
-            erreurs = True
-
-        if erreurs:
-            return
-
-        try:
-            heure_debut_obj = datetime.strptime(heure_debut, "%H:%M")
-            heure_fin_obj = datetime.strptime(heure_fin, "%H:%M")
-            if heure_debut_obj >= heure_fin_obj:
-                error_heure_fin.config(
-                    text="L'heure de fin doit être supérieure à l'heure de début."
-                )
-                return
-        except ValueError:
-            error_heure_debut.config(text="Format d'heure invalide (HH:MM).")
-            return
-
-        # Charger les salles disponibles
-        salles = afficher_salles_disponibles_pour_creneau(date_debut, date_fin)
-        salle_menu["values"] = [
-            f"{salle['id']} - {salle['type']} (Capacité: {salle['capacite']})"
-            for salle in salles
-        ]
-
+    entry_date_debut = ttk.Entry(frame_debut, width=30)
+    entry_date_debut.pack(pady=5)
+    ttk.Label(frame_debut, text="Heure de début (HH:MM)", background="#f0f8ff").pack(
+        anchor="center", pady=5
+    )
+    entry_heure_debut = ttk.Entry(frame_debut, width=30)
+    entry_heure_debut.pack(pady=5)
     ttk.Button(
-        frame,
-        text="Charger les salles",
-        command=charger_salles_disponibles,
-        width=25,  # Augmenté pour plus de lisibilité
+        frame_debut,
+        text="📅 Choisir",
+        command=lambda: ouvrir_calendrier(entry_date_debut, entry_heure_debut),
+        width=15,
         style="Accent.TButton",
     ).pack(pady=10)
+
+    # Conteneur pour la date et l'heure de fin
+    frame_fin = ttk.Frame(frame, style="TFrame")
+    frame_fin.pack(pady=10)
+    ttk.Label(frame_fin, text="Date de fin", background="#f0f8ff").pack(
+        anchor="center", pady=5
+    )
+    entry_date_fin = ttk.Entry(frame_fin, width=30)
+    entry_date_fin.pack(pady=5)
+    ttk.Label(frame_fin, text="Heure de fin (HH:MM)", background="#f0f8ff").pack(
+        anchor="center", pady=5
+    )
+    entry_heure_fin = ttk.Entry(frame_fin, width=30)
+    entry_heure_fin.pack(pady=5)
+    ttk.Button(
+        frame_fin,
+        text="📅 Choisir",
+        command=lambda: ouvrir_calendrier(entry_date_fin, entry_heure_fin),
+        width=15,
+        style="Accent.TButton",
+    ).pack(pady=10)
+
+    # Conteneur pour la liste des clients
+    frame_client = ttk.Frame(frame, style="TFrame")
+    frame_client.pack(pady=10)
+    ttk.Label(frame_client, text="Client", background="#f0f8ff").pack(
+        anchor="center", pady=5
+    )
+    client_var = tk.StringVar()
+    client_menu = ttk.Combobox(
+        frame_client, textvariable=client_var, state="readonly", width=37
+    )
+    client_menu["values"] = [
+        f"{client['id']} - {client['nom']} {client['prenom']}"
+        for client in afficher_clients()
+    ]
+    client_menu.pack(pady=5)
 
     # Boutons Valider et Annuler
     button_frame = ttk.Frame(frame)
@@ -440,15 +436,15 @@ def creer_section_reserver():
         text="Annuler",
         command=lambda: afficher_section(section_accueil),
         style="Secondary.TButton",
-        width=20,  # Augmenté pour plus de lisibilité
+        width=15,
     ).pack(side=tk.LEFT, padx=10)
 
     ttk.Button(
         button_frame,
         text="Valider",
-        command=lambda: print("Réservation validée"),
+        command=afficher_confirmation,
         style="Accent.TButton",
-        width=20,  # Augmenté pour plus de lisibilité
+        width=15,
     ).pack(side=tk.RIGHT, padx=10)
 
     return frame
@@ -506,6 +502,41 @@ def creer_section_afficher():
     ).pack(pady=10)
 
     return frame
+
+
+def ouvrir_calendrier(entry_date, entry_time):
+    """Ouvre un calendrier pour sélectionner une date, une heure et une minute."""
+    top = tk.Toplevel(root)
+    top.title("Sélectionner une date et une heure")
+    cal = Calendar(top, selectmode="day", date_pattern="yyyy-mm-dd")
+    cal.pack(pady=20)
+
+    # Sélection de l'heure
+    ttk.Label(top, text="Heure (HH):").pack(pady=5)
+    spin_heure = ttk.Spinbox(top, from_=0, to=23, width=5, format="%02.0f")
+    spin_heure.pack(pady=5)
+
+    # Sélection de la minute
+    ttk.Label(top, text="Minute (MM):").pack(pady=5)
+    spin_minute = ttk.Spinbox(top, from_=0, to=59, width=5, format="%02.0f")
+    spin_minute.pack(pady=5)
+
+    def confirmer_date_heure():
+        # Récupérer la date, l'heure et la minute sélectionnées
+        date = cal.get_date()
+        heure = spin_heure.get()
+        minute = spin_minute.get()
+
+        # Mettre à jour les champs d'entrée
+        entry_date.delete(0, tk.END)
+        entry_date.insert(0, date)
+
+        entry_time.delete(0, tk.END)
+        entry_time.insert(0, f"{heure}:{minute}")
+
+        top.destroy()
+
+    ttk.Button(top, text="Confirmer", command=confirmer_date_heure).pack(pady=10)
 
 
 def afficher_salles_pour_creneau():
