@@ -22,11 +22,16 @@ def ajouter_client(nom, email):
 
 
 # Ajouter une salle
-def ajouter_salle(nom, type_salle, capacite):
-    salle_id = str(uuid.uuid4())
-    salle = {"id": salle_id, "nom": nom, "type": type_salle, "capacite": capacite}
-    salles.append(salle)
-    return salle
+def ajouter_salle(nom_salle, type_salle, capacite):
+    """Ajoute une salle dans la base de données."""
+    nouvelle_salle = {
+        "id": nom_salle,  # L'ID est identique au nom
+        "nom": nom_salle,
+        "type": type_salle,
+        "capacite": capacite,
+    }
+    salles.append(nouvelle_salle)
+    return nouvelle_salle
 
 
 # Afficher les salles disponibles

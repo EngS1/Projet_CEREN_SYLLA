@@ -45,6 +45,18 @@
             "nom": "Salle3",
             "type": "Conf\u00e9rence",
             "capacite": 12
+        },
+        {
+            "id": "48c846e4-7737-44e5-87bd-eb1c9135e766",
+            "nom": "S1",
+            "type": "Standard",
+            "capacite": 3
+        },
+        {
+            "id": "sda",
+            "nom": "sda",
+            "type": "Conf\u00e9rence",
+            "capacite": 5
         }
     ],
     "reservations": []

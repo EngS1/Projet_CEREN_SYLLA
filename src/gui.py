@@ -5,6 +5,7 @@ from tkcalendar import Calendar
 from datetime import datetime
 from main import (
     ajouter_client,
+    ajouter_salle,
     afficher_salles_disponibles,
     afficher_clients,
     afficher_salles_disponibles_pour_creneau,
@@ -20,24 +21,6 @@ import json
 fichier_donnees = "data.json"
 charger_donnees(fichier_donnees)
 
-
-def ajouter_salle(nom_salle, type_salle, capacite):
-    """Ajoute une salle dans la base de données."""
-    data = charger_donnees()  # Appel sans argument
-
-    # Vérification de l'unicité du nom de la salle
-    if any(salle["id"] == nom_salle for salle in data["salles"]):
-        raise ValueError(f"Le nom de la salle '{nom_salle}' existe déjà.")
-
-    nouvelle_salle = {
-        "id": nom_salle,  # L'ID est identique au nom
-        "nom": nom_salle,
-        "type": type_salle,
-        "capacite": capacite,
-    }
-    data["salles"].append(nouvelle_salle)
-    sauvegarder_donnees(data)  # Appel sans argument
-    return nouvelle_salle
 
 
 def afficher_section(frame):
