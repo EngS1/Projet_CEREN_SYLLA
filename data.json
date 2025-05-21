@@ -64,5 +64,13 @@
             "capacite": 3
         }
     ],
-    "reservations": []
+    "reservations": [
+        {
+            "id": "db9973db-8400-49c5-a9e5-5ba893943f76",
+            "client_id": "a ds",
+            "salle_id": "2025-05-22 10:15:00",
+            "date_debut": "2025-05-22 11:30:00",
+            "date_fin": "Salle3 - Conf\u00e9rence (Capacit\u00e9: 12)"
+        }
+    ]
 }

@@ -39,6 +39,8 @@ def afficher_salles_disponibles():
     return [salle for salle in salles]
 
 
+
+
 # Réserver une salle
 def reserver_salle(client_id, salle_id, date_debut, date_fin):
     reservation_id = str(uuid.uuid4())
@@ -96,7 +98,7 @@ def supprimer_salle(salle_id):
 # Afficher les clients enregistrés
 def afficher_clients():
     """Retourne une liste de clients enregistrés."""
-    return clients
+    return [(client["nom"], client["prenom"]) for client in clients]
 
 
 # Charger les données depuis un fichier JSON
@@ -137,6 +139,7 @@ def valider_donnees(date_debut, date_fin):
     except ValueError:
         return False, "Format de date invalide. Utilisez le format YYYY-MM-DD HH:MM:SS."
 
+
 # Fonction pour vérifier la validité de l'email
 def verifier_email(email):
     try:
@@ -145,4 +148,3 @@ def verifier_email(email):
         return True, v.email  # Retourne True et l'email normalisé
     except EmailNotValidError:
         return False, "Email non valide"  # Retourne False et le message d'erreur
-
