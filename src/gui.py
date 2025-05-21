@@ -8,7 +8,6 @@ from main import (
     afficher_salles_disponibles,
     afficher_clients,
     afficher_salles_disponibles_pour_creneau,
-    afficher_reservations_client,
     charger_donnees,
     sauvegarder_donnees,
 )
@@ -597,6 +596,14 @@ def ouvrir_calendrier(entry_date, entry_time):
     cal.pack(pady=20)
 
     # Sélection de l'heure
+    ttk.Label(top, text="Heure (HH):").pack(pady=5)
+    spin_heure = ttk.Spinbox(top, from_=0, to=23, width=5, format="%02.0f")
+    spin_heure.pack(pady=5)
+
+    # Sélection de la minute
+    ttk.Label(top, text="Minute (MM):").pack(pady=5)
+    spin_minute = ttk.Spinbox(top, from_=0, to=59, width=5, format="%02.0f")
+    spin_minute.pack(pady=5)
     ttk.Label(top, text="Heure (HH):").pack(pady=5)
     spin_heure = ttk.Spinbox(top, from_=0, to=23, width=5, format="%02.0f")
     spin_heure.pack(pady=5)
