@@ -1,7 +1,13 @@
 {
     "client_id_counter": 0,
     "clients": [],
-    "salles": [],
+    "salles": [
+        {
+            "id": "1",
+            "nom": "S1",
+            "type": "Standard",
+            "capacite": 4
+        }],
     "reservations": [
         {
             "id": "dfe1dea2-a6ec-4c18-930b-28163ff780d5",

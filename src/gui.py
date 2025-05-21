@@ -11,6 +11,7 @@ from main import (
     afficher_reservations_client,
     charger_donnees,
     sauvegarder_donnees,
+    verifier_email,
 )
 import json
 
@@ -73,7 +74,10 @@ def creer_section_ajouter():
             """Valide les entrées et ajoute un client."""
             nom = entry_nom.get().strip()
             email = entry_email.get().strip()
-
+            est_valide, _ = verifier_email(email)
+            if not est_valide:
+                messagebox.showerror("Erreur", "Email invalide.")
+                return
             if not nom or not email:
                 messagebox.showerror("Erreur", "Veuillez remplir tous les champs.")
                 return

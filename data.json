@@ -1,10 +1,30 @@
 {
-    "client_id_counter": 3,
+    "client_id_counter": 7,
     "clients": [
         {
             "id": 0,
             "nom": "Sylla",
             "email": "daoudesylla@gmail.com"
+        },
+        {
+            "id": 3,
+            "nom": "Test",
+            "email": "minf"
+        },
+        {
+            "id": 4,
+            "nom": "asd",
+            "email": "sd@gmail.com"
+        },
+        {
+            "id": 5,
+            "nom": "test",
+            "email": "kubvcd@outlook.fr"
+        },
+        {
+            "id": 6,
+            "nom": "test",
+            "email": "kubvcd@outlook.com"
         }
     ],
     "salles": [
