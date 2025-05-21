@@ -1,5 +1,5 @@
 {
-    "client_id_counter": 3,
+    "client_id_counter": 6,
     "clients": [
         {
             "id": 1,
@@ -12,6 +12,24 @@
             "nom": "asd",
             "prenom": "ad",
             "email": "a@gmail.com"
+        },
+        {
+            "id": 3,
+            "nom": "a",
+            "prenom": "ds",
+            "email": "b@gmail.com"
+        },
+        {
+            "id": 4,
+            "nom": "a",
+            "prenom": "ds",
+            "email": "b@gmail.com"
+        },
+        {
+            "id": 5,
+            "nom": "a",
+            "prenom": "ds",
+            "email": "b@gmail.com"
         }
     ],
     "salles": [
@@ -32,12 +50,6 @@
             "nom": "Salle3",
             "type": "Conf\u00e9rence",
             "capacite": 12
-        },
-        {
-            "id": "48c846e4-7737-44e5-87bd-eb1c9135e766",
-            "nom": "S1",
-            "type": "Standard",
-            "capacite": 3
         },
         {
             "id": "sda",

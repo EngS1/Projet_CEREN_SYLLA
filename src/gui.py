@@ -395,6 +395,20 @@ def creer_section_reserver():
         if erreurs:
             return
 
+        # Validation des dates
+        try:
+            date_debut_obj = datetime.strptime(date_debut, "%Y-%m-%d").date()
+            date_fin_obj = datetime.strptime(date_fin, "%Y-%m-%d").date()
+            if date_debut_obj > date_fin_obj:
+                error_date_fin.config(
+                    text="La date de fin doit être égale ou postérieure à la date de début."
+                )
+                return
+        except ValueError:
+            error_date_debut.config(text="Format de date invalide (YYYY-MM-DD).")
+            return
+
+        # Validation des heures
         try:
             heure_debut_obj = datetime.strptime(heure_debut, "%H:%M")
             heure_fin_obj = datetime.strptime(heure_fin, "%H:%M")
@@ -413,6 +427,7 @@ def creer_section_reserver():
             f"{salle['id']} - {salle['type']} (Capacité: {salle['capacite']})"
             for salle in salles
         ]
+
 
     ttk.Button(
         frame,
