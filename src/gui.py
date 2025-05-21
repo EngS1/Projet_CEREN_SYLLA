@@ -49,13 +49,17 @@ def creer_section_ajouter():
         ttk.Label(frame, text="Nom", background="#f0f8ff").pack(pady=5)
         entry_nom = ttk.Entry(frame, width=40)
         entry_nom.pack(pady=5)
+        ttk.Label(frame, text="Prénom", background="#f0f8ff").pack(pady=5)
+        entry_prenom = ttk.Entry(frame, width=40)
+        entry_prenom.pack(pady=5)
         ttk.Label(frame, text="Email", background="#f0f8ff").pack(pady=5)
         entry_email = ttk.Entry(frame, width=40)
         entry_email.pack(pady=5)
 
-        def valider_client():
+        def valider_ajout_client():
             """Valide les entrées et ajoute un client."""
             nom = entry_nom.get().strip()
+            prenom = entry_prenom.get().strip()
             email = entry_email.get().strip()
             est_valide, _ = verifier_email(email)
             if not est_valide:
@@ -66,10 +70,10 @@ def creer_section_ajouter():
                 return
 
             # Ajout du client
-            client = ajouter_client(nom, email)
+            client = ajouter_client(nom, prenom, email)
             messagebox.showinfo(
                 "Succès",
-                f"Client ajouté avec succès :\nID: {client['id']}\nNom: {client['nom']}\nEmail: {client['email']}",
+                f"Client ajouté avec succès :\nID: {client['id']}\nNom: {client['nom']}\nPrénom: {client['prenom']}\nEmail: {client['email']}",
             )
             sauvegarder_donnees(fichier_donnees)
 
@@ -88,7 +92,7 @@ def creer_section_ajouter():
         ttk.Button(
             button_frame,
             text="Valider",
-            command=valider_client,
+            command=valider_ajout_client,
             style="Accent.TButton",
             width=15,
         ).pack(side=tk.RIGHT, padx=10)

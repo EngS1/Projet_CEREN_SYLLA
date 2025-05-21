@@ -1,30 +1,17 @@
 {
-    "client_id_counter": 7,
+    "client_id_counter": 3,
     "clients": [
         {
-            "id": 0,
-            "nom": "Sylla",
-            "email": "daoudesylla@gmail.com"
+            "id": 1,
+            "nom": "Ceren",
+            "prenom": "Muhammed",
+            "email": "misndf@outlook.fr"
         },
         {
-            "id": 3,
-            "nom": "Test",
-            "email": "minf"
-        },
-        {
-            "id": 4,
+            "id": 2,
             "nom": "asd",
-            "email": "sd@gmail.com"
-        },
-        {
-            "id": 5,
-            "nom": "test",
-            "email": "kubvcd@outlook.fr"
-        },
-        {
-            "id": 6,
-            "nom": "test",
-            "email": "kubvcd@outlook.com"
+            "prenom": "ad",
+            "email": "a@gmail.com"
         }
     ],
     "salles": [
@@ -57,6 +44,12 @@
             "nom": "sda",
             "type": "Conf\u00e9rence",
             "capacite": 5
+        },
+        {
+            "id": "sda2",
+            "nom": "sda2",
+            "type": "Conf\u00e9rence",
+            "capacite": 3
         }
     ],
     "reservations": []

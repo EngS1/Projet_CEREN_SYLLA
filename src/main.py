@@ -12,10 +12,10 @@ client_id_counter = 0  # Nouveau compteur pour les identifiants des clients
 
 
 # Ajouter un client
-def ajouter_client(nom, email):
+def ajouter_client(nom, prenom, email):
     global clients, client_id_counter
     client_id = client_id_counter  # Utilise le compteur actuel comme ID
-    client = {"id": client_id, "nom": nom, "email": email}
+    client = {"id": client_id, "nom": nom, "prenom": prenom, "email": email}
     clients.append(client)
     client_id_counter += 1  # Incrémente le compteur
     return client
