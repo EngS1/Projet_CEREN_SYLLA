@@ -1,10 +1,35 @@
 {
-    "client_id_counter": 3,
+    "client_id_counter": 6,
     "clients": [
         {
-            "id": 0,
-            "nom": "Sylla",
-            "email": "daoudesylla@gmail.com"
+            "id": 1,
+            "nom": "Ceren",
+            "prenom": "Muhammed",
+            "email": "misndf@outlook.fr"
+        },
+        {
+            "id": 2,
+            "nom": "asd",
+            "prenom": "ad",
+            "email": "a@gmail.com"
+        },
+        {
+            "id": 3,
+            "nom": "a",
+            "prenom": "ds",
+            "email": "b@gmail.com"
+        },
+        {
+            "id": 4,
+            "nom": "a",
+            "prenom": "ds",
+            "email": "b@gmail.com"
+        },
+        {
+            "id": 5,
+            "nom": "a",
+            "prenom": "ds",
+            "email": "b@gmail.com"
         }
     ],
     "salles": [
@@ -25,7 +50,27 @@
             "nom": "Salle3",
             "type": "Conf\u00e9rence",
             "capacite": 12
+        },
+        {
+            "id": "sda",
+            "nom": "sda",
+            "type": "Conf\u00e9rence",
+            "capacite": 5
+        },
+        {
+            "id": "sda2",
+            "nom": "sda2",
+            "type": "Conf\u00e9rence",
+            "capacite": 3
         }
     ],
-    "reservations": []
+    "reservations": [
+        {
+            "id": "db9973db-8400-49c5-a9e5-5ba893943f76",
+            "client_id": "a ds",
+            "salle_id": "2025-05-22 10:15:00",
+            "date_debut": "2025-05-22 11:30:00",
+            "date_fin": "Salle3 - Conf\u00e9rence (Capacit\u00e9: 12)"
+        }
+    ]
 }
