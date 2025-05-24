@@ -1,5 +1,5 @@
 {
-    "client_id_counter": 6,
+    "client_id_counter": 7,
     "clients": [
         {
             "id": 1,
@@ -30,6 +30,12 @@
             "nom": "a",
             "prenom": "ds",
             "email": "b@gmail.com"
+        },
+        {
+            "id": 6,
+            "nom": "xmsp",
+            "prenom": "cm",
+            "email": "aaa@cms.com"
         }
     ],
     "salles": [

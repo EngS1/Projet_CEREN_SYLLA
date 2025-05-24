@@ -1,8 +1,11 @@
 from model import ajouter_client
 
 
-def valider_et_ajouter_client(prenom, nom, email):
-    """Valide les données et ajoute un client."""
+"""Controller for managing clients in the application."""
+
+
+def valider_et_ajouter_client(prenom, nom, email) -> str:
+    """Validate the client data and add the client."""
     if not prenom.isalpha():
         return "Erreur : Le prénom doit contenir uniquement des lettres."
     if not nom.isalpha():
@@ -10,6 +13,6 @@ def valider_et_ajouter_client(prenom, nom, email):
     if "@" not in email or "." not in email:
         return "Erreur : Adresse email incorrecte."
 
-    # Ajouter le client via le modèle
+    """Add a new client to the database."""
     client = ajouter_client(prenom, nom, email)
     return f"Client ajouté avec succès : {client}"

@@ -4,15 +4,18 @@ from datetime import datetime
 from email_validator import validate_email, EmailNotValidError
 
 
-# Gestion des données
+"""Database managment"""
 clients = []
 salles = []
 reservations = []
-client_id_counter = 0  # Nouveau compteur pour les identifiants des clients
+client_id_counter = 0
 
 
-# Ajouter un client
-def ajouter_client(nom, prenom, email):
+"""Initialisation de la base de données"""
+
+
+def ajouter_client(nom, prenom, email) -> dict:
+    """Add a client to the database."""
     global clients, client_id_counter
     client_id = client_id_counter  # Utilise le compteur actuel comme ID
     client = {"id": client_id, "nom": nom, "prenom": prenom, "email": email}
@@ -21,9 +24,10 @@ def ajouter_client(nom, prenom, email):
     return client
 
 
-# Ajouter une salle
-def ajouter_salle(nom_salle, type_salle, capacite):
-    """Ajoute une salle dans la base de données."""
+"""Add a room to the database"""
+
+
+def ajouter_salle(nom_salle, type_salle, capacite) -> dict:
     nouvelle_salle = {
         "id": nom_salle,  # L'ID est identique au nom
         "nom": nom_salle,
@@ -34,15 +38,17 @@ def ajouter_salle(nom_salle, type_salle, capacite):
     return nouvelle_salle
 
 
-# Afficher les salles disponibles
+"""Show available rooms"""
+
+
 def afficher_salles_disponibles():
     return [salle for salle in salles]
 
 
+"""Reserve a room for a client"""
 
 
-# Réserver une salle
-def reserver_salle(client_id, salle_id, date_debut, date_fin):
+def reserver_salle(client_id, salle_id, date_debut, date_fin) -> dict:
     reservation_id = str(uuid.uuid4())
     reservation = {
         "id": reservation_id,
@@ -55,13 +61,18 @@ def reserver_salle(client_id, salle_id, date_debut, date_fin):
     return reservation
 
 
-# Afficher les réservations d'un client
-def afficher_reservations_client(client_id):
+"""Show all reservations"""
+
+
+def afficher_reservations_client(client_id) -> list:
     return [res for res in reservations if res["client_id"] == client_id]
 
 
-# Vérifier la disponibilité d'une salle
-def verifier_disponibilite_salle(salle_id, date_debut, date_fin):
+"""Show all reservations for a room"""
+
+
+def verifier_disponibilite_salle(salle_id, date_debut, date_fin) -> bool:
+    """Check if a room is available for a given time slot."""
     for res in reservations:
         if res["salle_id"] == salle_id and not (
             date_fin <= res["date_debut"] or date_debut >= res["date_fin"]
@@ -70,8 +81,11 @@ def verifier_disponibilite_salle(salle_id, date_debut, date_fin):
     return True
 
 
-# Afficher les salles disponibles pour un créneau
-def afficher_salles_disponibles_pour_creneau(date_debut, date_fin):
+"""Show available rooms for a specific time slot"""
+
+
+def afficher_salles_disponibles_pour_creneau(date_debut, date_fin) -> list:
+    """Return a list of available rooms for a specific time slot."""
     salles_disponibles = []
     for salle in salles:
         if verifier_disponibilite_salle(salle["id"], date_debut, date_fin):
@@ -79,30 +93,39 @@ def afficher_salles_disponibles_pour_creneau(date_debut, date_fin):
     return salles_disponibles
 
 
-# Supprimer un client
-def supprimer_client(client_id):
+"""Delete a reservation"""
+
+
+def supprimer_client(client_id) -> str:
     global clients, reservations
     clients = [client for client in clients if client["id"] != client_id]
     reservations = [res for res in reservations if res["client_id"] != client_id]
     return f"Client {client_id} et ses réservations associées ont été supprimés."
 
 
-# Supprimer une salle
-def supprimer_salle(salle_id):
+"""Delete a room and its associated reservations"""
+
+
+def supprimer_salle(salle_id) -> str:
     global salles, reservations
     salles = [salle for salle in salles if salle["id"] != salle_id]
     reservations = [res for res in reservations if res["salle_id"] != salle_id]
     return f"Salle {salle_id} et ses réservations associées ont été supprimées."
 
 
-# Afficher les clients enregistrés
-def afficher_clients():
-    """Retourne une liste de clients enregistrés."""
+"""Display all registered clients"""
+
+
+def afficher_clients() -> list:
+    """Return a list of all registered clients."""
     return [(client["nom"], client["prenom"]) for client in clients]
 
 
-# Charger les données depuis un fichier JSON
-def charger_donnees(fichier):
+"""Display all registered rooms"""
+
+
+def charger_donnees(fichier) -> None:
+    """Load data from a JSON file."""
     global clients, salles, reservations, client_id_counter
     try:
         with open(fichier, "r") as f:
@@ -116,7 +139,9 @@ def charger_donnees(fichier):
         client_id_counter = 0
 
 
-# Sauvegarder les données dans un fichier JSON
+"""Save data to a JSON file."""
+
+
 def sauvegarder_donnees(fichier):
     data = {
         "client_id_counter": client_id_counter,
@@ -128,8 +153,11 @@ def sauvegarder_donnees(fichier):
         json.dump(data, f, indent=4)
 
 
-# Valider les données d'entrée
-def valider_donnees(date_debut, date_fin):
+"""Validate start and end dates for a reservation"""
+
+
+def valider_donnees(date_debut, date_fin) -> tuple:
+    """Check if the start date is before the end date."""
     try:
         debut = datetime.strptime(date_debut, "%Y-%m-%dT%H:%M:%S")
         fin = datetime.strptime(date_fin, "%Y-%m-%dT%H:%M:%S")
@@ -140,11 +168,13 @@ def valider_donnees(date_debut, date_fin):
         return False, "Format de date invalide. Utilisez le format YYYY-MM-DD HH:MM:SS."
 
 
-# Fonction pour vérifier la validité de l'email
+"""Validate and normalize an email address"""
+
+
 def verifier_email(email):
     try:
-        # Valider et normaliser l'email
+        """Validate and normalize an email address."""
         v = validate_email(email)
-        return True, v.email  # Retourne True et l'email normalisé
+        return True, v.email
     except EmailNotValidError:
-        return False, "Email non valide"  # Retourne False et le message d'erreur
+        return False, "Email non valide"

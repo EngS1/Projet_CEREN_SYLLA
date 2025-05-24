@@ -4,19 +4,19 @@ FICHIER_DONNEES = "data.json"
 
 
 def charger_donnees():
-    """Charge les données depuis le fichier JSON."""
+    """Load data from the JSON file."""
     with open(FICHIER_DONNEES, "r") as f:
         return json.load(f)
 
 
 def sauvegarder_donnees(data):
-    """Sauvegarde les données dans le fichier JSON."""
+    """Save data to the JSON file."""
     with open(FICHIER_DONNEES, "w") as f:
         json.dump(data, f, indent=4)
 
 
 def ajouter_client(prenom, nom, email):
-    """Ajoute un client dans la base de données."""
+    """Add a new client to the database."""
     data = charger_donnees()
     client_id = data["client_id_counter"] + 1
     nouveau_client = {"id": client_id, "prenom": prenom, "nom": nom, "email": email}
