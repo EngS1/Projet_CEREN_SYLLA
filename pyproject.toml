@@ -9,6 +9,8 @@ description = "Application pour gérer les réservations de salles"
 authors = [{name = "CEREN/ SYLLA", email = "daoudesylla@gmail.com"}]
 dependencies = [
     "tkcalendar",  # Widget calendrier pour tkinter
+    "pytest==6.2.4",
+    
 ]
 [project.scripts]
 lancer_application = "src.gui:main"
