@@ -66,8 +66,7 @@ def creer_section_ajouter():
                 messagebox.showerror("Erreur", "Email invalide.")
                 return
             if not nom or not email:
-                messagebox.showerror(
-                    "Erreur", "Veuillez remplir tous les champs.")
+                messagebox.showerror("Erreur", "Veuillez remplir tous les champs.")
                 return
 
             # Ajout du client
@@ -122,8 +121,7 @@ def creer_section_ajouter():
         error_nom_salle.pack()
 
         # Menu déroulant pour le type de salle
-        ttk.Label(frame, text="Type de salle",
-                  background="#f0f8ff").pack(pady=5)
+        ttk.Label(frame, text="Type de salle", background="#f0f8ff").pack(pady=5)
         type_salle_var = tk.StringVar()
         type_salle_menu = ttk.Combobox(
             frame, textvariable=type_salle_var, state="readonly", width=37
@@ -185,12 +183,10 @@ def creer_section_ajouter():
                 error_nom_salle.config(text="Veuillez entrer un nom de salle.")
                 erreurs = True
             if not type_salle:
-                error_type_salle.config(
-                    text="Veuillez sélectionner un type de salle.")
+                error_type_salle.config(text="Veuillez sélectionner un type de salle.")
                 erreurs = True
             if capacite <= 0:
-                error_capacite.config(
-                    text="La capacité doit être supérieure à 0.")
+                error_capacite.config(text="La capacité doit être supérieure à 0.")
                 erreurs = True
 
             # Limitation de la capacité en fonction du type de salle
@@ -345,17 +341,16 @@ def creer_section_reserver():
         background="#f0f8ff",
     ).pack(pady=10)
     # Sélection de la date de début
-    ttk.Label(frame, text="Date de début",
-              background="#f0f8ff").pack(pady=5)
+    ttk.Label(frame, text="Date de début", background="#f0f8ff").pack(pady=5)
     entry_date_debut = ttk.Entry(frame, width=40)
     entry_date_debut.pack(pady=5)
-    error_date_debut = ttk.Label(
-        frame, text="", foreground="red", background="#f0f8ff")
+    error_date_debut = ttk.Label(frame, text="", foreground="red", background="#f0f8ff")
     error_date_debut.pack()
 
     def ouvrir_calendrier_debut():
         """Ouvre un calendrier pour sélectionner la date de début."""
         ouvrir_calendrier(entry_date_debut, frame)
+
     ttk.Button(
         frame,
         text="📅 Choisir",
@@ -368,8 +363,7 @@ def creer_section_reserver():
     ttk.Label(frame, text="Date de fin", background="#f0f8ff").pack(pady=5)
     entry_date_fin = ttk.Entry(frame, width=40)
     entry_date_fin.pack(pady=5)
-    error_date_fin = ttk.Label(
-        frame, text="", foreground="red", background="#f0f8ff")
+    error_date_fin = ttk.Label(frame, text="", foreground="red", background="#f0f8ff")
     error_date_fin.pack()
 
     def ouvrir_calendrier_fin():
@@ -387,31 +381,25 @@ def creer_section_reserver():
     # Liste des clients
     tk.Label(frame, text="Client").pack(pady=5)
     liste_clients = afficher_clients()
-    entry_client = ttk.Combobox(
-        frame, values=liste_clients, state="readonly", width=40)
+    entry_client = ttk.Combobox(frame, values=liste_clients, state="readonly", width=40)
     entry_client.set("Sélectionner un client")
     entry_client.pack()
-    error_client = ttk.Label(
-        frame, text="", foreground="red", background="#f0f8ff")
+    error_client = ttk.Label(frame, text="", foreground="red", background="#f0f8ff")
     error_client.pack()
 
     # Liste des salles disponibles
-    ttk.Label(frame, text="Salles disponibles",
-              background="#f0f8ff").pack(pady=10)
+    ttk.Label(frame, text="Salles disponibles", background="#f0f8ff").pack(pady=10)
     salle_var = tk.StringVar()
-    salle_menu = ttk.Combobox(
-        frame, textvariable=salle_var, state="readonly", width=40)
+    salle_menu = ttk.Combobox(frame, textvariable=salle_var, state="readonly", width=40)
     salle_menu.pack(pady=5)
-    error_salle = ttk.Label(
-        frame, text="", foreground="red", background="#f0f8ff")
+    error_salle = ttk.Label(frame, text="", foreground="red", background="#f0f8ff")
     error_salle.pack()
 
     def charger_salles_disponibles():
         """Charge les salles disponibles pour les créneaux choisis."""
         date_debut_str = entry_date_debut.get().strip()
         date_fin_str = entry_date_fin.get().strip()
-        date_debut_obj = datetime.strptime(
-            date_debut_str, "%Y-%m-%d %H:%M:%S")
+        date_debut_obj = datetime.strptime(date_debut_str, "%Y-%m-%d %H:%M:%S")
 
         date_fin_obj = datetime.strptime(date_fin_str, "%Y-%m-%d %H:%M:%S")
         date_debut = date_debut_obj.strftime("%Y-%m-%d")
@@ -428,12 +416,10 @@ def creer_section_reserver():
         # Vérification des champs
         erreurs = False
         if not date_debut:
-            error_date_debut.config(
-                text="Veuillez sélectionner une date de début.")
+            error_date_debut.config(text="Veuillez sélectionner une date de début.")
             erreurs = True
         if not date_fin:
-            error_date_fin.config(
-                text="Veuillez sélectionner une date de fin.")
+            error_date_fin.config(text="Veuillez sélectionner une date de fin.")
             erreurs = True
         if entry_client.get() == "Sélectionner un client":
             error_client.config(text="Veuillez sélectionner un client.")
@@ -449,8 +435,7 @@ def creer_section_reserver():
                 )
                 return
         except ValueError:
-            error_date_debut.config(
-                text="Format de date invalide (YYYY-MM-DD).")
+            error_date_debut.config(text="Format de date invalide (YYYY-MM-DD).")
             return
 
         # Validation des heures
@@ -461,13 +446,11 @@ def creer_section_reserver():
                 )
                 return
         except ValueError:
-            error_date_debut.config(
-                text="Format d'heure invalide (HH:MM).")
+            error_date_debut.config(text="Format d'heure invalide (HH:MM).")
             return
 
         # Charger les salles disponibles
-        salles = afficher_salles_disponibles_pour_creneau(
-            date_debut, date_fin)
+        salles = afficher_salles_disponibles_pour_creneau(date_debut, date_fin)
         salle_menu["values"] = [
             f"{salle['id']} - {salle['type']} (Capacité: {salle['capacite']})"
             for salle in salles
@@ -481,12 +464,17 @@ def creer_section_reserver():
         style="Accent.TButton",
     ).pack(pady=10)
 
-    def afficher_recapitulatif_reservation(client_nom, date_debut, date_fin, duree, salle_nom, salle_type, salle_capacite):
+    def afficher_recapitulatif_reservation(
+        client_nom, date_debut, date_fin, duree, salle_nom, salle_type, salle_capacite
+    ):
         # Efface le contenu du frame
         for widget in frame.winfo_children():
             widget.destroy()
-        ttk.Label(frame, text="Récapitulatif de la réservation",
-                  font=("Helvetica", 14, "bold")).pack(pady=15)
+        ttk.Label(
+            frame,
+            text="Récapitulatif de la réservation",
+            font=("Helvetica", 14, "bold"),
+        ).pack(pady=15)
         ttk.Label(frame, text=f"Client : {client_nom}").pack(pady=5)
         ttk.Label(frame, text=f"Date de début : {date_debut}").pack(pady=5)
         ttk.Label(frame, text=f"Date de fin : {date_fin}").pack(pady=5)
@@ -494,8 +482,11 @@ def creer_section_reserver():
         ttk.Label(frame, text=f"Salle : {salle_nom}").pack(pady=5)
         ttk.Label(frame, text=f"Type de salle : {salle_type}").pack(pady=5)
         ttk.Label(frame, text=f"Capacité : {salle_capacite}").pack(pady=5)
-        ttk.Button(frame, text="Retour à l'accueil", command=lambda: afficher_section(
-            section_accueil)).pack(pady=20)
+        ttk.Button(
+            frame,
+            text="Retour à l'accueil",
+            command=lambda: afficher_section(section_accueil),
+        ).pack(pady=20)
 
     def valider_reservation():
         # Réserver la salle
@@ -503,7 +494,10 @@ def creer_section_reserver():
             error_salle.config(text="Veuillez sélectionner une salle.")
             return
         reserver_salle(
-            entry_client.get(), entry_date_debut.get(), entry_date_fin.get(), salle_var.get()
+            entry_client.get(),
+            entry_date_debut.get(),
+            entry_date_fin.get(),
+            salle_var.get(),
         )
         # Récupérer les infos pour le récapitulatif
         client_nom = entry_client.get()
@@ -523,8 +517,7 @@ def creer_section_reserver():
             try:
                 salle_nom = salle_info.split(" - ")[0]
                 salle_type = salle_info.split(" - ")[1].split(" (")[0]
-                salle_capacite = salle_info.split(
-                    "Capacité: ")[1].replace(")", "")
+                salle_capacite = salle_info.split("Capacité: ")[1].replace(")", "")
             except Exception:
                 salle_nom = salle_info
                 salle_type = ""
@@ -533,10 +526,17 @@ def creer_section_reserver():
             salle_nom = salle_type = salle_capacite = ""
         # Afficher la fenêtre de récapitulatif
         afficher_recapitulatif_reservation(
-            client_nom, date_debut, date_fin, duree, salle_nom, salle_type, salle_capacite)
-        messagebox.showinfo("Réserver avec succès",
-                            "La réservation est validée")
+            client_nom,
+            date_debut,
+            date_fin,
+            duree,
+            salle_nom,
+            salle_type,
+            salle_capacite,
+        )
+        messagebox.showinfo("Réserver avec succès", "La réservation est validée")
         sauvegarder_donnees(fichier_donnees)
+
     # Boutons Valider et Annuler
     button_frame = ttk.Frame(frame)
     button_frame.pack(pady=20)
@@ -643,8 +643,7 @@ def afficher_salles_pour_creneau():
         heure_fin = entry_heure_fin.get().strip()
 
         try:
-            salles = afficher_salles_disponibles_pour_creneau(
-                date_debut, date_fin)
+            salles = afficher_salles_disponibles_pour_creneau(date_debut, date_fin)
             if not salles:
                 messagebox.showinfo(
                     "Résultat", "Aucune salle disponible pour ce créneau."
@@ -659,8 +658,7 @@ def afficher_salles_pour_creneau():
             )
             messagebox.showinfo("Salles disponibles", texte)
         except Exception as e:
-            messagebox.showerror(
-                "Erreur", f"Erreur lors de la recherche : {e}")
+            messagebox.showerror("Erreur", f"Erreur lors de la recherche : {e}")
 
     ttk.Button(top, text="Rechercher", command=rechercher_salles).pack(pady=10)
 
@@ -729,11 +727,9 @@ def afficher_reservations_client():
             )
             messagebox.showinfo("Réservations", texte)
         except Exception as e:
-            messagebox.showerror(
-                "Erreur", f"Erreur lors de la recherche : {e}")
+            messagebox.showerror("Erreur", f"Erreur lors de la recherche : {e}")
 
-    ttk.Button(top, text="Rechercher",
-               command=rechercher_reservations).pack(pady=10)
+    ttk.Button(top, text="Rechercher", command=rechercher_reservations).pack(pady=10)
 
 
 def recreer_et_afficher_section_reserver():
@@ -761,9 +757,7 @@ def menu_principal():
     menu_bar.add_command(
         label="Ajouter", command=lambda: afficher_section(section_ajouter)
     )
-    menu_bar.add_command(
-        label="Réserver", command=recreer_et_afficher_section_reserver
-    )
+    menu_bar.add_command(label="Réserver", command=recreer_et_afficher_section_reserver)
 
     menu_bar.add_command(
         label="Afficher", command=lambda: afficher_section(section_afficher)
@@ -806,7 +800,7 @@ def menu_principal():
 
     # Sections dynamiques
     section_ajouter = creer_section_ajouter()
-   # section_reserver = creer_section_reserver()
+    # section_reserver = creer_section_reserver()
     section_afficher = creer_section_afficher()
 
     # Afficher la section Accueil par défaut
