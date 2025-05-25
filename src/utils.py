@@ -66,13 +66,13 @@ def sauvegarder_fichier_json(fichier, donnees):
 
 
 # Vérification de disponibilité
-def verifier_disponibilite_salle(salle_id, date_debut, date_fin, bookings):
+def check_room_availability(salle_id, start_date, end_date, bookings):
     """
     Vérifie si une salle est disponible pour un créneau donné.
     """
     for res in bookings:
         if res["salle_id"] == salle_id and not (
-            date_fin <= res["date_debut"] or date_debut >= res["date_fin"]
+            end_date <= res["start_date"] or start_date >= res["end_date"]
         ):
             return False
     return True
