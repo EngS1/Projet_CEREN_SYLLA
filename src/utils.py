@@ -1,6 +1,7 @@
 from datetime import datetime
 import json
 
+
 # Validation des données
 def valider_date(date_str):
     """
@@ -12,6 +13,7 @@ def valider_date(date_str):
     except ValueError:
         return False
 
+
 # Recherche d'entités
 def trouver_client_par_id(client_id, clients):
     """
@@ -22,14 +24,16 @@ def trouver_client_par_id(client_id, clients):
             return client
     return None
 
-def trouver_salle_par_id(salle_id, salles):
+
+def trouver_salle_par_id(salle_id, rooms):
     """
     Recherche une salle par son identifiant.
     """
-    for salle in salles:
+    for salle in rooms:
         if salle["id"] == salle_id:
             return salle
     return None
+
 
 # Génération d'identifiants uniques
 def generer_id_unique(liste, champ_id="id"):
@@ -39,6 +43,7 @@ def generer_id_unique(liste, champ_id="id"):
     if not liste:
         return 0
     return max(item[champ_id] for item in liste) + 1
+
 
 # Gestion des fichiers JSON
 def charger_fichier_json(fichier):
@@ -51,6 +56,7 @@ def charger_fichier_json(fichier):
     except FileNotFoundError:
         return {}
 
+
 def sauvegarder_fichier_json(fichier, donnees):
     """
     Sauvegarde les données dans un fichier JSON.
@@ -58,25 +64,28 @@ def sauvegarder_fichier_json(fichier, donnees):
     with open(fichier, "w") as f:
         json.dump(donnees, f, indent=4)
 
+
 # Vérification de disponibilité
-def verifier_disponibilite_salle(salle_id, date_debut, date_fin, reservations):
+def verifier_disponibilite_salle(salle_id, date_debut, date_fin, bookings):
     """
     Vérifie si une salle est disponible pour un créneau donné.
     """
-    for res in reservations:
+    for res in bookings:
         if res["salle_id"] == salle_id and not (
             date_fin <= res["date_debut"] or date_debut >= res["date_fin"]
         ):
             return False
     return True
 
-def charger_donnees(fichier):
+
+def load_data(fichier):
     try:
         with open(fichier, "r") as f:
             return json.load(f)
     except FileNotFoundError:
-        return {"clients": [], "salles": [], "reservations": []}
+        return {"clients": [], "rooms": [], "bookings": []}
 
-def sauvegarder_donnees(fichier, donnees):
+
+def save_data(fichier, donnees):
     with open(fichier, "w") as f:
         json.dump(donnees, f, indent=4)

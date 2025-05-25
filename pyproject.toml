@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "projet_ceren_sylla"
 version = "1.0.0"
-description = "Application pour gérer les réservations de salles"
+description = "Application pour gérer les réservations de rooms"
 authors = [{name = "CEREN/ SYLLA", email = "daoudesylla@gmail.com"}]
 dependencies = [
     "tkcalendar",  # Widget calendrier pour tkinter
