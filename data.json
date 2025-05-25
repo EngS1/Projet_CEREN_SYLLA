@@ -38,7 +38,7 @@
             "email": "aaa@cms.com"
         }
     ],
-    "salles": [
+    "rooms": [
         {
             "id": "Salle1",
             "nom": "Salle1",
@@ -70,7 +70,7 @@
             "capacite": 3
         }
     ],
-    "reservations": [
+    "bookings": [
         {
             "id": "db9973db-8400-49c5-a9e5-5ba893943f76",
             "client_id": "a ds",

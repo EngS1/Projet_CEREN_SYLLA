@@ -6,16 +6,16 @@ from tkinter import ttk
 from tkcalendar import Calendar
 from datetime import datetime
 from main import (
-    ajouter_client,
-    ajouter_salle,
-    afficher_salles_disponibles,
-    afficher_clients,
-    reserver_salle,
-    afficher_salles_disponibles_pour_creneau,
-    afficher_reservations_client,
-    charger_donnees,
-    sauvegarder_donnees,
-    verifier_email,
+    add_client,
+    add_room,
+    show_available_rooms,
+    show_clients,
+    book_room,
+    show_available_rooms_for_niche,
+    show_clients_bookings,
+    load_data,
+    save_data,
+    check_email,
 )
 import json
 import logging
@@ -35,7 +35,7 @@ logger.info("Application started")
 """Upload data from JSON file."""
 fichier_donnees = "data.json"
 logger.info(f"Loading data from {fichier_donnees}")
-charger_donnees(fichier_donnees)
+load_data(fichier_donnees)
 
 
 """Global variables for sections."""
@@ -80,7 +80,7 @@ def creer_section_ajouter():
             nom = entry_nom.get().strip()
             prenom = entry_prenom.get().strip()
             email = entry_email.get().strip()
-            est_valide, _ = verifier_email(email)
+            est_valide, _ = check_email(email)
             if not est_valide:
                 logger.warning("Invalid email entered")
                 messagebox.showerror("Erreur", "Email invalide.")
@@ -91,13 +91,13 @@ def creer_section_ajouter():
                 return
 
             """Add the client."""
-            client = ajouter_client(nom, prenom, email)
+            client = add_client(nom, prenom, email)
             logger.info(f"Client added successfully: {client}")
             messagebox.showinfo(
                 "Succès",
                 f"Client ajouté avec succès :\nID: {client['id']}\nNom: {client['nom']}\nPrénom: {client['prenom']}\nEmail: {client['email']}",
             )
-            sauvegarder_donnees(fichier_donnees)
+            save_data(fichier_donnees)
 
         """Buttons for Cancel and Validate."""
         button_frame = ttk.Frame(frame)
@@ -233,8 +233,8 @@ def creer_section_ajouter():
                 return
 
             """Verification of existing room names."""
-            salles_existantes = afficher_salles_disponibles()
-            if any(salle["id"] == nom_salle for salle in salles_existantes):
+            existing_rooms = show_available_rooms()
+            if any(salle["id"] == nom_salle for salle in existing_rooms):
                 error_nom_salle.config(
                     text=f"Le nom de la salle '{nom_salle}' existe déjà. Veuillez en choisir un autre."
                 )
@@ -242,13 +242,13 @@ def creer_section_ajouter():
                 return
 
             """Addition of the room."""
-            salle = ajouter_salle(nom_salle, type_salle, capacite)
+            salle = add_room(nom_salle, type_salle, capacite)
             logger.info(f"Room added successfully: {salle}")
             messagebox.showinfo(
                 "Succès",
                 f"Salle ajoutée avec succès :\nNom: {salle['id']}\nType: {salle['type']}\nCapacité: {salle['capacite']}",
             )
-            sauvegarder_donnees(fichier_donnees)
+            save_data(fichier_donnees)
             afficher_boutons_principaux()
 
         """Buttons for Cancel and Validate."""
@@ -407,7 +407,7 @@ def creer_section_reserver() -> None:
 
     """Client selection."""
     tk.Label(frame, text="Client").pack(pady=5)
-    liste_clients = afficher_clients()
+    liste_clients = show_clients()
     entry_client = ttk.Combobox(frame, values=liste_clients, state="readonly", width=40)
     entry_client.set("Sélectionner un client")
     entry_client.pack()
@@ -415,14 +415,14 @@ def creer_section_reserver() -> None:
     error_client.pack()
 
     """Load clients to the combobox."""
-    ttk.Label(frame, text="Salles disponibles", background="#f0f8ff").pack(pady=10)
+    ttk.Label(frame, text="rooms disponibles", background="#f0f8ff").pack(pady=10)
     salle_var = tk.StringVar()
     salle_menu = ttk.Combobox(frame, textvariable=salle_var, state="readonly", width=40)
     salle_menu.pack(pady=5)
     error_salle = ttk.Label(frame, text="", foreground="red", background="#f0f8ff")
     error_salle.pack()
 
-    def charger_salles_disponibles() -> None:
+    def charger_rooms_disponibles() -> None:
         """Load available rooms based on the selected date and time."""
         date_debut_str = entry_date_debut.get().strip()
         date_fin_str = entry_date_fin.get().strip()
@@ -477,16 +477,16 @@ def creer_section_reserver() -> None:
             return
 
         """Load available rooms for the selected date and time."""
-        salles = afficher_salles_disponibles_pour_creneau(date_debut, date_fin)
+        rooms = show_available_rooms_for_niche(date_debut, date_fin)
         salle_menu["values"] = [
             f"{salle['id']} - {salle['type']} (Capacité: {salle['capacite']})"
-            for salle in salles
+            for salle in rooms
         ]
 
     ttk.Button(
         frame,
-        text="Charger les salles",
-        command=charger_salles_disponibles,
+        text="Charger les rooms",
+        command=charger_rooms_disponibles,
         width=25,
         style="Accent.TButton",
     ).pack(pady=10)
@@ -520,7 +520,7 @@ def creer_section_reserver() -> None:
         if salle_menu.get() == "":
             error_salle.config(text="Veuillez sélectionner une salle.")
             return
-        reserver_salle(
+        book_room(
             entry_client.get(),
             entry_date_debut.get(),
             entry_date_fin.get(),
@@ -562,7 +562,7 @@ def creer_section_reserver() -> None:
             salle_capacite,
         )
         messagebox.showinfo("Réserver avec succès", "La réservation est validée")
-        sauvegarder_donnees(fichier_donnees)
+        save_data(fichier_donnees)
 
     """Buttons for Cancel and Validate."""
     button_frame = ttk.Frame(frame)
@@ -605,8 +605,8 @@ def creer_section_afficher() -> ttk.Frame:
     """Button to display the list of rooms."""
     ttk.Button(
         button_frame,
-        text="Afficher liste des salles",
-        command=afficher_liste_salles,
+        text="Afficher liste des rooms",
+        command=afficher_liste_rooms,
         width=45,  # Augmenté de 40 à 45
         style="Accent.TButton",
     ).pack(pady=10)
@@ -623,17 +623,17 @@ def creer_section_afficher() -> ttk.Frame:
     """Button to display available rooms for a time slot."""
     ttk.Button(
         button_frame,
-        text="Afficher les salles disponibles pour un créneau",
-        command=afficher_salles_pour_creneau,
+        text="Afficher les rooms disponibles pour un créneau",
+        command=afficher_rooms_for_niche,
         width=45,  # Augmenté de 40 à 45
         style="Accent.TButton",
     ).pack(pady=10)
 
-    """Button to display reservations for a client."""
+    """Button to display bookings for a client."""
     ttk.Button(
         button_frame,
         text="Afficher les réservations pour un client",
-        command=afficher_reservations_client_gui,
+        command=show_clients_bookings_gui,
         width=45,  # Augmenté de 40 à 45
         style="Accent.TButton",
     ).pack(pady=10)
@@ -641,10 +641,10 @@ def creer_section_afficher() -> ttk.Frame:
     return frame
 
 
-def afficher_salles_pour_creneau() -> None:
+def afficher_rooms_for_niche() -> None:
     """Show a popup to find available rooms for a time slot."""
     top = tk.Toplevel(root)
-    top.title("Salles disponibles pour un créneau")
+    top.title("rooms disponibles pour un créneau")
     top.geometry("400x300")
 
     ttk.Label(top, text="Date de début (YYYY-MM-DD):").pack(pady=5)
@@ -663,7 +663,7 @@ def afficher_salles_pour_creneau() -> None:
     entry_heure_fin = ttk.Entry(top, width=30)
     entry_heure_fin.pack(pady=5)
 
-    def rechercher_salles() -> None:
+    def rechercher_rooms() -> None:
         """Search for available rooms based on the provided date and time."""
         date_debut = entry_date_debut.get().strip()
         date_fin = entry_date_fin.get().strip()
@@ -671,8 +671,8 @@ def afficher_salles_pour_creneau() -> None:
         heure_fin = entry_heure_fin.get().strip()
 
         try:
-            salles = afficher_salles_disponibles_pour_creneau(date_debut, date_fin)
-            if not salles:
+            rooms = show_available_rooms_for_niche(date_debut, date_fin)
+            if not rooms:
                 messagebox.showinfo(
                     "Résultat", "Aucune salle disponible pour ce créneau."
                 )
@@ -681,36 +681,36 @@ def afficher_salles_pour_creneau() -> None:
             texte = "\n".join(
                 [
                     f"Nom: {salle['id']}, Type: {salle['type']}, Capacité: {salle['capacite']}"
-                    for salle in salles
+                    for salle in rooms
                 ]
             )
-            messagebox.showinfo("Salles disponibles", texte)
+            messagebox.showinfo("rooms disponibles", texte)
         except Exception as e:
             messagebox.showerror("Erreur", f"Erreur lors de la recherche : {e}")
 
-    ttk.Button(top, text="Rechercher", command=rechercher_salles).pack(pady=10)
+    ttk.Button(top, text="Rechercher", command=rechercher_rooms).pack(pady=10)
 
 
-def afficher_liste_salles() -> None:
+def afficher_liste_rooms() -> None:
     """Show the list of available rooms in a popup."""
-    salles = afficher_salles_disponibles()
-    if not salles:
+    rooms = show_available_rooms()
+    if not rooms:
         messagebox.showinfo("Information", "Aucune salle disponible.")
         return
 
     texte = "\n".join(
         [
             f"Nom: {salle['id']}, Type: {salle['type']}, Capacité: {salle['capacite']}"
-            for salle in salles
+            for salle in rooms
         ]
     )
-    messagebox.showinfo("Liste des salles", texte)
+    messagebox.showinfo("Liste des rooms", texte)
 
 
 def afficher_liste_clients() -> None:
     """Show the list of registered clients in a popup."""
     """Display the list of clients in a popup."""
-    clients = afficher_clients()
+    clients = show_clients()
     if not clients:
         messagebox.showinfo("Information", "Aucun client enregistré.")
         return
@@ -724,8 +724,8 @@ def afficher_liste_clients() -> None:
     messagebox.showinfo("Liste des clients", texte)
 
 
-def afficher_reservations_client_gui() -> None:
-    """Show a popup to search for reservations by client ID."""
+def show_clients_bookings_gui() -> None:
+    """Show a popup to search for bookings by client ID."""
     top = tk.Toplevel(root)
     top.title("Réservations pour un client")
     top.geometry("400x200")
@@ -734,15 +734,15 @@ def afficher_reservations_client_gui() -> None:
     entry_client_id = ttk.Entry(top, width=30)
     entry_client_id.pack(pady=5)
 
-    def rechercher_reservations() -> None:
+    def rechercher_bookings() -> None:
         client_id = entry_client_id.get().strip()
         if not client_id:
             messagebox.showerror("Erreur", "Veuillez entrer un ID de client.")
             return
 
         try:
-            reservations = afficher_reservations_client(client_id)
-            if not reservations:
+            bookings = show_clients_bookings(client_id)
+            if not bookings:
                 messagebox.showinfo(
                     "Résultat", "Aucune réservation trouvée pour ce client."
                 )
@@ -751,14 +751,14 @@ def afficher_reservations_client_gui() -> None:
             texte = "\n".join(
                 [
                     f"Date: {res['date']}, Heure: {res['heure_debut']} - {res['heure_fin']}, Salle: {res['salle_id']}"
-                    for res in reservations
+                    for res in bookings
                 ]
             )
             messagebox.showinfo("Réservations", texte)
         except Exception as e:
             messagebox.showerror("Erreur", f"Erreur lors de la recherche : {e}")
 
-    ttk.Button(top, text="Rechercher", command=rechercher_reservations).pack(pady=10)
+    ttk.Button(top, text="Rechercher", command=rechercher_bookings).pack(pady=10)
 
 
 def recreer_et_afficher_section_reserver() -> None:

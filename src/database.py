@@ -1,4 +1,4 @@
-from utils import charger_donnees, sauvegarder_donnees
+from utils import load_data, save_data
 
 """Managment of the database for the reservation system."""
 FICHIER_BDD = "data/database.json"
@@ -6,9 +6,9 @@ FICHIER_BDD = "data/database.json"
 
 def lire_bdd() -> dict:
     """Reads the database from the JSON file."""
-    return charger_donnees(FICHIER_BDD)
+    return load_data(FICHIER_BDD)
 
 
 def ecrire_bdd(donnees) -> None:
     """Writes the database to the JSON file."""
-    sauvegarder_donnees(FICHIER_BDD, donnees)
+    save_data(FICHIER_BDD, donnees)

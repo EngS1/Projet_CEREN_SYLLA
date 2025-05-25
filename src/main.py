@@ -6,15 +6,15 @@ from email_validator import validate_email, EmailNotValidError
 
 """Database managment"""
 clients = []
-salles = []
-reservations = []
+rooms = []
+bookings = []
 client_id_counter = 0
 
 
 """Initialisation de la base de données"""
 
 
-def ajouter_client(nom, prenom, email) -> dict:
+def add_client(nom, prenom, email) -> dict:
     """Add a client to the database."""
     global clients, client_id_counter
     client_id = client_id_counter  # Utilise le compteur actuel comme ID
@@ -27,28 +27,28 @@ def ajouter_client(nom, prenom, email) -> dict:
 """Add a room to the database"""
 
 
-def ajouter_salle(nom_salle, type_salle, capacite) -> dict:
+def add_room(nom_salle, type_salle, capacite) -> dict:
     nouvelle_salle = {
         "id": nom_salle,  # L'ID est identique au nom
         "nom": nom_salle,
         "type": type_salle,
         "capacite": capacite,
     }
-    salles.append(nouvelle_salle)
+    rooms.append(nouvelle_salle)
     return nouvelle_salle
 
 
 """Show available rooms"""
 
 
-def afficher_salles_disponibles():
-    return [salle for salle in salles]
+def show_available_rooms():
+    return [salle for salle in rooms]
 
 
 """Reserve a room for a client"""
 
 
-def reserver_salle(client_id, salle_id, date_debut, date_fin) -> dict:
+def book_room(client_id, salle_id, date_debut, date_fin) -> dict:
     reservation_id = str(uuid.uuid4())
     reservation = {
         "id": reservation_id,
@@ -57,23 +57,23 @@ def reserver_salle(client_id, salle_id, date_debut, date_fin) -> dict:
         "date_debut": date_debut,
         "date_fin": date_fin,
     }
-    reservations.append(reservation)
+    bookings.append(reservation)
     return reservation
 
 
-"""Show all reservations"""
+"""Show all bookings"""
 
 
-def afficher_reservations_client(client_id) -> list:
-    return [res for res in reservations if res["client_id"] == client_id]
+def show_clients_bookings(client_id) -> list:
+    return [res for res in bookings if res["client_id"] == client_id]
 
 
-"""Show all reservations for a room"""
+"""Show all bookings for a room"""
 
 
 def verifier_disponibilite_salle(salle_id, date_debut, date_fin) -> bool:
     """Check if a room is available for a given time slot."""
-    for res in reservations:
+    for res in bookings:
         if res["salle_id"] == salle_id and not (
             date_fin <= res["date_debut"] or date_debut >= res["date_fin"]
         ):
@@ -84,39 +84,39 @@ def verifier_disponibilite_salle(salle_id, date_debut, date_fin) -> bool:
 """Show available rooms for a specific time slot"""
 
 
-def afficher_salles_disponibles_pour_creneau(date_debut, date_fin) -> list:
+def show_available_rooms_for_niche(date_debut, date_fin) -> list:
     """Return a list of available rooms for a specific time slot."""
-    salles_disponibles = []
-    for salle in salles:
+    rooms_disponibles = []
+    for salle in rooms:
         if verifier_disponibilite_salle(salle["id"], date_debut, date_fin):
-            salles_disponibles.append(salle)
-    return salles_disponibles
+            rooms_disponibles.append(salle)
+    return rooms_disponibles
 
 
 """Delete a reservation"""
 
 
 def supprimer_client(client_id) -> str:
-    global clients, reservations
+    global clients, bookings
     clients = [client for client in clients if client["id"] != client_id]
-    reservations = [res for res in reservations if res["client_id"] != client_id]
+    bookings = [res for res in bookings if res["client_id"] != client_id]
     return f"Client {client_id} et ses réservations associées ont été supprimés."
 
 
-"""Delete a room and its associated reservations"""
+"""Delete a room and its associated bookings"""
 
 
 def supprimer_salle(salle_id) -> str:
-    global salles, reservations
-    salles = [salle for salle in salles if salle["id"] != salle_id]
-    reservations = [res for res in reservations if res["salle_id"] != salle_id]
+    global rooms, bookings
+    rooms = [salle for salle in rooms if salle["id"] != salle_id]
+    bookings = [res for res in bookings if res["salle_id"] != salle_id]
     return f"Salle {salle_id} et ses réservations associées ont été supprimées."
 
 
 """Display all registered clients"""
 
 
-def afficher_clients() -> list:
+def show_clients() -> list:
     """Return a list of all registered clients."""
     return [(client["nom"], client["prenom"]) for client in clients]
 
@@ -124,30 +124,30 @@ def afficher_clients() -> list:
 """Display all registered rooms"""
 
 
-def charger_donnees(fichier) -> None:
+def load_data(fichier) -> None:
     """Load data from a JSON file."""
-    global clients, salles, reservations, client_id_counter
+    global clients, rooms, bookings, client_id_counter
     try:
         with open(fichier, "r") as f:
             data = json.load(f)
             clients = data.get("clients", [])
-            salles = data.get("salles", [])
-            reservations = data.get("reservations", [])
+            rooms = data.get("rooms", [])
+            bookings = data.get("bookings", [])
             client_id_counter = data.get("client_id_counter", 0)
     except FileNotFoundError:
-        clients, salles, reservations = [], [], []
+        clients, rooms, bookings = [], [], []
         client_id_counter = 0
 
 
 """Save data to a JSON file."""
 
 
-def sauvegarder_donnees(fichier):
+def save_data(fichier):
     data = {
         "client_id_counter": client_id_counter,
         "clients": clients,
-        "salles": salles,
-        "reservations": reservations,
+        "rooms": rooms,
+        "bookings": bookings,
     }
     with open(fichier, "w") as f:
         json.dump(data, f, indent=4)
@@ -171,7 +171,7 @@ def valider_donnees(date_debut, date_fin) -> tuple:
 """Validate and normalize an email address"""
 
 
-def verifier_email(email):
+def check_email(email):
     try:
         """Validate and normalize an email address."""
         v = validate_email(email)
