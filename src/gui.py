@@ -38,18 +38,33 @@ logger.info(f"Loading data from {file_data}")
 load_data(file_data)
 
 
-"""Global variables for sections."""
-
-
 def display_section(frame) -> None:
     """Show a specific section in the main window."""
+    global previous_section
+
+    """Clear the current section and create a new one."""
+    for widget in root.winfo_children():
+        if isinstance(widget, ttk.Frame) and widget.winfo_ismapped():
+            previous_section = widget
+            break
+
+    """ Check if the frame is valid and exists before displaying it."""
+    if not frame or not frame.winfo_exists():
+        logger.error(
+            "Invalid frame passed to display_section. Returning to home_section."
+        )
+
+    """ Clear the current section and pack the new frame."""
     for widget in root.winfo_children():
         if isinstance(widget, ttk.Frame):
             widget.pack_forget()
     frame.pack(fill=tk.BOTH, expand=True)
 
 
-def create_add_section():
+""" Log the section change."""
+
+
+def create_add_section() -> ttk.Frame:
     """Create the section Ajouter."""
     frame = ttk.Frame(root, style="TFrame")
 
@@ -118,6 +133,8 @@ def create_add_section():
             style="Accent.TButton",
             width=15,
         ).pack(side=tk.RIGHT, padx=10)
+
+    """Function to display the form for adding a room."""
 
     def display_room_form() -> None:
         """Show the form to add a room."""
@@ -271,6 +288,8 @@ def create_add_section():
             width=15,
         ).pack(side=tk.RIGHT, padx=10)
 
+    """Function to display the main buttons in the 'Add' section."""
+
     def display_main_buttons() -> None:
         """Show the main buttons in the 'Add' section."""
         logger.info("Displaying main buttons in 'Add' section")
@@ -284,19 +303,22 @@ def create_add_section():
             frame,
             text="Ajouter nouveau client",
             command=display_client_form,
-            width=35,  # Augmenté de 30 à 35
+            width=35,
             style="Accent.TButton",
         ).pack(pady=10)
         ttk.Button(
             frame,
             text="Ajouter nouvelle salle",
             command=display_room_form,
-            width=35,  # Augmenté de 30 à 35
+            width=35,
             style="Accent.TButton",
         ).pack(pady=10)
 
     display_main_buttons()
     return frame
+
+
+"""Function to open a calendar popup for date and time selection."""
 
 
 def open_calendar(entry, parent_window):
@@ -333,6 +355,8 @@ def open_calendar(entry, parent_window):
     btn_frame = ttk.Frame(main_frame)
     btn_frame.pack(pady=20, fill=tk.X)
 
+    """Button to validate the selected date and time."""
+
     def valider_creneau() -> None:
         """Validates the selected date and time, and updates the entry field."""
         date = cal.get_date()
@@ -351,6 +375,9 @@ def open_calendar(entry, parent_window):
     ttk.Button(btn_frame, text="Valider ce créneau", command=valider_creneau).pack(
         side=tk.BOTTOM
     )
+
+
+"""Function to create the booking section."""
 
 
 def create_booking_section() -> None:
@@ -382,7 +409,7 @@ def create_booking_section() -> None:
         frame,
         text="📅 Choisir",
         command=open_calendar_start,
-        width=20,  # Ajusté pour plus de lisibilité
+        width=20,
         style="Accent.TButton",
     ).pack(pady=5)
 
@@ -401,7 +428,7 @@ def create_booking_section() -> None:
         frame,
         text="📅 Choisir",
         command=open_calendar_end,
-        width=20,  # Ajusté pour plus de lisibilité
+        width=20,
         style="Accent.TButton",
     ).pack(pady=5)
 
@@ -613,7 +640,7 @@ def create_display_section() -> ttk.Frame:
         button_frame,
         text="Afficher liste des salles",
         command=display_rooms_lists,
-        width=45,  # Augmenté de 40 à 45
+        width=45,
         style="Accent.TButton",
     ).pack(pady=10)
 
@@ -621,17 +648,17 @@ def create_display_section() -> ttk.Frame:
     ttk.Button(
         button_frame,
         text="Afficher liste des clients",
-        command=display_cliemt_list,
-        width=45,  # Augmenté de 40 à 45
+        command=display_client_list,
+        width=45,
         style="Accent.TButton",
     ).pack(pady=10)
 
     """Button to display available rooms for a time slot."""
     ttk.Button(
         button_frame,
-        text="Afficher les rooms disponibles pour un créneau",
+        text="Afficher les salles disponibles pour un créneau",
         command=display_rooms_for_niche,
-        width=45,  # Augmenté de 40 à 45
+        width=45,
         style="Accent.TButton",
     ).pack(pady=10)
 
@@ -640,7 +667,7 @@ def create_display_section() -> ttk.Frame:
         button_frame,
         text="Afficher les réservations pour un client",
         command=display_clients_bookings_gui,
-        width=45,  # Augmenté de 40 à 45
+        width=45,
         style="Accent.TButton",
     ).pack(pady=10)
 
@@ -710,101 +737,280 @@ def display_rooms_lists() -> None:
             for room in rooms
         ]
     )
-    messagebox.showinfo("Liste des rooms", texte)
+    messagebox.showinfo("Liste des salles", texte)
 
 
-def display_cliemt_list() -> None:
-    """Show the list of registered clients in a popup."""
-    """Display the list of clients in a popup."""
+def display_clients() -> list:
+    """Returns the list of clients from the JSON file."""
+    with open("data.json", "r") as file:
+        data = json.load(file)
+    return data.get("clients", [])
+
+
+def display_client_list() -> None:
+    """Displays the list of registered clients in the main window."""
+    """Clear the current section and create a new one for displaying clients."""
+    for widget in root.winfo_children():
+        widget.destroy()
+
+    """Create a new frame for the client list section."""
+    frame = ttk.Frame(root, style="TFrame")
+    frame.pack(fill=tk.BOTH, expand=True)
+
+    """Section title for the list of clients."""
+    ttk.Label(
+        frame,
+        text="Liste des Clients",
+        font=("Helvetica", 16, "bold"),
+        background="#f0f8ff",
+    ).pack(pady=10)
+
+    """Fetch the list of clients."""
     clients = display_clients()
     if not clients:
-        messagebox.showinfo("Information", "Aucun client enregistré.")
+        ttk.Label(
+            frame,
+            text="No clients registered.",
+            font=("Helvetica", 12),
+            background="#f0f8ff",
+        ).pack(pady=20)
         return
 
-    texte = "\n".join(
-        [
-            f"ID: {client['id']}, Nom: {client['nom']}, Prénom: {client['prenom']}, Email: {client['email']}"
-            for client in clients
-        ]
-    )
-    messagebox.showinfo("Liste des clients", texte)
+    """Create a table to display the clients."""
+    table_frame = ttk.Frame(frame)
+    table_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=10)
+
+    """Create headers for the table."""
+    headers = ["ID", "Name", "Surname", "Email"]
+    for col, header in enumerate(headers):
+        ttk.Label(
+            table_frame,
+            text=header,
+            font=("Helvetica", 12, "bold"),
+            borderwidth=1,
+            relief="solid",
+            anchor="center",
+            background="#d3d3d3",
+            width=20,
+        ).grid(row=0, column=col, sticky="nsew")
+
+    """ Populate the table with client data """
+    for row, client in enumerate(clients, start=1):
+        ttk.Label(
+            table_frame,
+            text=client["id"],
+            borderwidth=1,
+            relief="solid",
+            anchor="center",
+            background="#ffffff",
+        ).grid(row=row, column=0, sticky="nsew")
+        ttk.Label(
+            table_frame,
+            text=client["nom"],
+            borderwidth=1,
+            relief="solid",
+            anchor="center",
+            background="#ffffff",
+        ).grid(row=row, column=1, sticky="nsew")
+        ttk.Label(
+            table_frame,
+            text=client["prenom"],
+            borderwidth=1,
+            relief="solid",
+            anchor="center",
+            background="#ffffff",
+        ).grid(row=row, column=2, sticky="nsew")
+        ttk.Label(
+            table_frame,
+            text=client["email"],
+            borderwidth=1,
+            relief="solid",
+            anchor="center",
+            background="#ffffff",
+        ).grid(row=row, column=3, sticky="nsew")
+
+    """Button to return to the home page."""
+    button_frame = ttk.Frame(frame)
+    button_frame.pack(pady=20)
+    ttk.Button(
+        button_frame,
+        text="Retour",
+        command=menu_principal,
+        style="Secondary.TButton",
+        width=20,
+    ).pack(side=tk.LEFT, padx=10)
 
 
 def display_clients_bookings_gui() -> None:
-    """Show a popup to search for bookings by client ID."""
-    top = tk.Toplevel(root)
-    top.title("Réservations pour un client")
-    top.geometry("400x200")
+    """Displays the bookings for a client directly in the main window."""
+    for widget in root.winfo_children():
+        widget.destroy()
+    """Create a new frame for the client bookings section."""
+    frame = ttk.Frame(root, style="TFrame")
+    frame.pack(fill=tk.BOTH, expand=True)
 
-    ttk.Label(top, text="ID du client:").pack(pady=5)
-    entry_client_id = ttk.Entry(top, width=30)
+    ttk.Label(
+        frame,
+        text="Bookings for a Client",
+        font=("Helvetica", 16, "bold"),
+        background="#f0f8ff",
+    ).pack(pady=10)
+
+    """Label and entry for client ID input."""
+    ttk.Label(frame, text="Client ID:", background="#f0f8ff").pack(pady=5)
+    entry_client_id = ttk.Entry(frame, width=40)
     entry_client_id.pack(pady=5)
 
-    def rechercher_bookings() -> None:
+    """Frame to display the results of the bookings search."""
+    results_frame = ttk.Frame(frame)
+    results_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=10)
+
+    def search_bookings() -> None:
+        """Searches for bookings based on the provided client ID."""
+        """Clear the results frame before displaying new results."""
+        for widget in results_frame.winfo_children():
+            widget.destroy()
+
         client_id = entry_client_id.get().strip()
         if not client_id:
-            messagebox.showerror("Erreur", "Veuillez entrer un ID de client.")
+            ttk.Label(
+                results_frame,
+                text="Please enter a client ID.",
+                font=("Helvetica", 12),
+                foreground="red",
+                background="#f0f8ff",
+            ).pack(pady=10)
             return
 
         try:
             bookings = display_clients_bookings(client_id)
             if not bookings:
-                messagebox.showinfo(
-                    "Résultat", "Aucune réservation trouvée pour ce client."
-                )
+                ttk.Label(
+                    results_frame,
+                    text="No bookings found for this client.",
+                    font=("Helvetica", 12),
+                    background="#f0f8ff",
+                ).pack(pady=10)
                 return
 
-            texte = "\n".join(
-                [
-                    f"Date: {res['date']}, Heure: {res['start_hour']} - {res['end_hour']}, room: {res['room_id']}"
-                    for res in bookings
-                ]
-            )
-            messagebox.showinfo("Réservations", texte)
-        except Exception as e:
-            messagebox.showerror("Erreur", f"Erreur lors de la recherche : {e}")
+            """Create headers for the bookings table."""
+            headers = ["Booking ID", "Room", "Start Date", "End Date"]
+            for col, header in enumerate(headers):
+                ttk.Label(
+                    results_frame,
+                    text=header,
+                    font=("Helvetica", 12, "bold"),
+                    borderwidth=1,
+                    relief="solid",
+                    anchor="center",
+                    background="#d3d3d3",
+                    width=20,
+                ).grid(row=0, column=col, sticky="nsew")
 
-    ttk.Button(top, text="Rechercher", command=rechercher_bookings).pack(pady=10)
+            """Populate the table with booking data."""
+            for row, booking in enumerate(bookings, start=1):
+                ttk.Label(
+                    results_frame,
+                    text=booking["id"],  # Booking ID
+                    borderwidth=1,
+                    relief="solid",
+                    anchor="center",
+                    background="#ffffff",
+                ).grid(row=row, column=0, sticky="nsew")
+                ttk.Label(
+                    results_frame,
+                    text=booking["salle_id"],  # Room ID
+                    borderwidth=1,
+                    relief="solid",
+                    anchor="center",
+                    background="#ffffff",
+                ).grid(row=row, column=1, sticky="nsew")
+                ttk.Label(
+                    results_frame,
+                    text=booking["start_date"],  # Start Date
+                    borderwidth=1,
+                    relief="solid",
+                    anchor="center",
+                    background="#ffffff",
+                ).grid(row=row, column=2, sticky="nsew")
+                ttk.Label(
+                    results_frame,
+                    text=booking["end_date"],  # End Date
+                    borderwidth=1,
+                    relief="solid",
+                    anchor="center",
+                    background="#ffffff",
+                ).grid(row=row, column=3, sticky="nsew")
+
+        except Exception as e:
+            ttk.Label(
+                results_frame,
+                text=f"Error during search: {e}",
+                font=("Helvetica", 12),
+                foreground="red",
+                background="#f0f8ff",
+            ).pack(pady=10)
+
+    """Button to search for bookings."""
+
+    ttk.Button(
+        frame,
+        text="Rechercher",
+        command=search_bookings,
+        style="Accent.TButton",
+    ).pack(pady=10)
+
+    """ Button to return to the home page"""
+    ttk.Button(
+        frame,
+        text="Retour",
+        command=menu_principal,
+        style="Accent.TButton",
+    ).pack(pady=20)
+
+
+"""Display the frame with the client ID input and results section."""
 
 
 def recreate_and_display_booking_section() -> None:
-    """Recreate and display the reservation section."""
+    """Recreates and displays the booking section."""
     global section_reserver
     section_reserver = create_booking_section()
     display_section(section_reserver)
 
 
+"""Display the specified section in the main window."""
+
+
 def menu_principal() -> None:
-    """Initialize the main menu and sections of the application."""
+    """Initializes the main menu and sections of the application."""
     global root
-    global add_section, display_section, home_section, display_section_frame
+    global add_section, display_section_frame, home_section
 
-    root = tk.Tk()
-    root.title("MeetingPro - Accueil")
-    root.geometry("800x700")
-    root.resizable(False, False)
-    root.configure(bg="#f0f8ff")
+    """Clear the current window and set up the main menu."""
+    for widget in root.winfo_children():
+        widget.destroy()
 
-    """Style configuration."""
+    """Create the main menu bar with options for each section."""
     menu_bar = tk.Menu(root)
     menu_bar.add_command(label="Accueil", command=lambda: display_section(home_section))
     menu_bar.add_command(label="Ajouter", command=lambda: display_section(add_section))
-    menu_bar.add_command(label="Réserver", command=recreate_and_display_booking_section)
+    menu_bar.add_command(label="Reserver", command=recreate_and_display_booking_section)
     menu_bar.add_command(
         label="Afficher", command=lambda: display_section(display_section_frame)
     )
     root.config(menu=menu_bar)
 
-    """Style configuration for ttk."""
+    """Create the home section with a welcome message and main menu buttons."""
     home_section = ttk.Frame(root, style="TFrame")
     ttk.Label(
         home_section,
-        text="Bienvenue sur MeetingPro",
+        text="Welcome to MeetingPro",
         font=("Helvetica", 20, "bold"),
         background="#f0f8ff",
     ).pack(pady=20)
 
-    """Button frame for the main menu."""
+    """"Create a frame for the main buttons in the home section."""
     button_frame = ttk.Frame(home_section, style="TFrame")
     button_frame.pack(pady=50)
     ttk.Button(
@@ -816,7 +1022,7 @@ def menu_principal() -> None:
     ).pack(pady=10)
     ttk.Button(
         button_frame,
-        text="Réserver",
+        text="Reserver",
         command=recreate_and_display_booking_section,
         width=20,
         style="Accent.TButton",
@@ -829,15 +1035,21 @@ def menu_principal() -> None:
         style="Accent.TButton",
     ).pack(pady=10)
 
-    """Create sections."""
+    """Create the sections for adding clients and rooms, and displaying information."""
     add_section = create_add_section()
-    display_section_frame = create_display_section()  # Renommé pour éviter le conflit
+    display_section_frame = create_display_section()
 
-    """Display the home section by default."""
+    """Display the home section."""
     display_section(home_section)
 
     root.mainloop()
 
 
+"""Create the section for adding clients and rooms."""
 if __name__ == "__main__":
+    root = tk.Tk()
+    root.title("MeetingPro - Gestion des Réservations")
+    root.geometry("800x700")
+    root.resizable(False, False)
+    root.configure(bg="#f0f8ff")
     menu_principal()

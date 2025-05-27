@@ -1,5 +1,5 @@
 {
-    "client_id_counter": 8,
+    "client_id_counter": 9,
     "clients": [
         {
             "id": 1,
@@ -42,6 +42,12 @@
             "nom": "scmkp",
             "prenom": "scnscpnq",
             "email": "cm@gmail.com"
+        },
+        {
+            "id": 8,
+            "nom": "fehfe",
+            "prenom": "dns\u0131d",
+            "email": "aaaa@gmail.com"
         }
     ],
     "rooms": [
