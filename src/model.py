@@ -1,17 +1,17 @@
 import json
 
-FICHIER_DONNEES = "data.json"
+FILE_DATA = "data.json"
 
 
 def load_data():
     """Load data from the JSON file."""
-    with open(FICHIER_DONNEES, "r") as f:
+    with open(FILE_DATA, "r") as f:
         return json.load(f)
 
 
 def save_data(data):
     """Save data to the JSON file."""
-    with open(FICHIER_DONNEES, "w") as f:
+    with open(FILE_DATA, "w") as f:
         json.dump(data, f, indent=4)
 
 

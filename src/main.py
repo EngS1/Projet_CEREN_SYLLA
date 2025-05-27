@@ -41,21 +41,21 @@ def add_room(nom_salle, type_salle, capacite) -> dict:
 """Show available rooms"""
 
 
-def show_available_rooms():
+def display_available_rooms():
     return [salle for salle in rooms]
 
 
 """Reserve a room for a client"""
 
 
-def book_room(client_id, salle_id, date_debut, date_fin) -> dict:
+def book_room(client_id, salle_id, start_date, end_date) -> dict:
     reservation_id = str(uuid.uuid4())
     reservation = {
         "id": reservation_id,
         "client_id": client_id,
         "salle_id": salle_id,
-        "date_debut": date_debut,
-        "date_fin": date_fin,
+        "start_date": start_date,
+        "end_date": end_date,
     }
     bookings.append(reservation)
     return reservation
@@ -64,18 +64,18 @@ def book_room(client_id, salle_id, date_debut, date_fin) -> dict:
 """Show all bookings"""
 
 
-def show_clients_bookings(client_id) -> list:
+def display_clients_bookings(client_id) -> list:
     return [res for res in bookings if res["client_id"] == client_id]
 
 
 """Show all bookings for a room"""
 
 
-def verifier_disponibilite_salle(salle_id, date_debut, date_fin) -> bool:
+def check_room_availability(salle_id, start_date, end_date) -> bool:
     """Check if a room is available for a given time slot."""
     for res in bookings:
         if res["salle_id"] == salle_id and not (
-            date_fin <= res["date_debut"] or date_debut >= res["date_fin"]
+            end_date <= res["start_date"] or start_date >= res["end_date"]
         ):
             return False
     return True
@@ -84,11 +84,11 @@ def verifier_disponibilite_salle(salle_id, date_debut, date_fin) -> bool:
 """Show available rooms for a specific time slot"""
 
 
-def show_available_rooms_for_niche(date_debut, date_fin) -> list:
+def display_available_rooms_for_niche(start_date, end_date) -> list:
     """Return a list of available rooms for a specific time slot."""
     rooms_disponibles = []
     for salle in rooms:
-        if verifier_disponibilite_salle(salle["id"], date_debut, date_fin):
+        if check_room_availability(salle["id"], start_date, end_date):
             rooms_disponibles.append(salle)
     return rooms_disponibles
 
@@ -96,7 +96,7 @@ def show_available_rooms_for_niche(date_debut, date_fin) -> list:
 """Delete a reservation"""
 
 
-def supprimer_client(client_id) -> str:
+def remove_client(client_id) -> str:
     global clients, bookings
     clients = [client for client in clients if client["id"] != client_id]
     bookings = [res for res in bookings if res["client_id"] != client_id]
@@ -106,7 +106,7 @@ def supprimer_client(client_id) -> str:
 """Delete a room and its associated bookings"""
 
 
-def supprimer_salle(salle_id) -> str:
+def remove_room(salle_id) -> str:
     global rooms, bookings
     rooms = [salle for salle in rooms if salle["id"] != salle_id]
     bookings = [res for res in bookings if res["salle_id"] != salle_id]
@@ -116,7 +116,7 @@ def supprimer_salle(salle_id) -> str:
 """Display all registered clients"""
 
 
-def show_clients() -> list:
+def display_clients() -> list:
     """Return a list of all registered clients."""
     return [(client["nom"], client["prenom"]) for client in clients]
 
@@ -156,11 +156,11 @@ def save_data(fichier):
 """Validate start and end dates for a reservation"""
 
 
-def valider_donnees(date_debut, date_fin) -> tuple:
+def validate_data(start_date, end_date) -> tuple:
     """Check if the start date is before the end date."""
     try:
-        debut = datetime.strptime(date_debut, "%Y-%m-%dT%H:%M:%S")
-        fin = datetime.strptime(date_fin, "%Y-%m-%dT%H:%M:%S")
+        debut = datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%S")
+        fin = datetime.strptime(end_date, "%Y-%m-%dT%H:%M:%S")
         if debut >= fin:
             return False, "La date de début doit être antérieure à la date de fin."
         return True, None

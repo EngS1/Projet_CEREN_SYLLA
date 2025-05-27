@@ -1,5 +1,5 @@
 import pytest
-from main import add_client, add_room, book_room, verifier_disponibilite_salle
+from main import add_client, add_room, book_room, check_room_availability
 
 
 def test_add_client():
@@ -15,12 +15,12 @@ def test_add_room():
     assert salle["capacite"] == 4
 
 
-def test_verifier_disponibilite_salle():
+def test_check_room_availability():
     salle_id = "1"
     book_room("client1", salle_id, "2025-05-01T10:00:00", "2025-05-01T12:00:00")
-    assert not verifier_disponibilite_salle(
+    assert not check_room_availability(
         salle_id, "2025-05-01T11:00:00", "2025-05-01T13:00:00"
     )
-    assert verifier_disponibilite_salle(
+    assert check_room_availability(
         salle_id, "2025-05-01T12:00:00", "2025-05-01T14:00:00"
     )

@@ -1,6 +1,6 @@
 # **MeetingPro**
 
-MeetingPro est une application de gestion de réservations de rooms, développée en Python avec une interface graphique basée sur `tkinter`. Elle permet aux utilisateurs de gérer les clients, les rooms, et les réservations de manière intuitive et efficace.
+MeetingPro est une application de gestion de réservations de salles, développée en Python avec une interface graphique basée sur `tkinter`. Elle permet aux utilisateurs de gérer les clients, les salles, et les réservations de manière intuitive et efficace.
 
 ---
 
@@ -22,13 +22,13 @@ MeetingPro est une application de gestion de réservations de rooms, développé
 - Ajouter un nouveau client avec son nom, prénom et email.
 - Afficher la liste des clients enregistrés.
 
-### **2. Gestion des rooms**
+### **2. Gestion des salles**
 - Ajouter une salle avec un nom unique, un type (Standard, Conférence, Informatique) et une capacité.
-- Afficher la liste des rooms disponibles.
+- Afficher la liste des salles disponibles.
 
 ### **3. Réservations**
 - Réserver une salle pour un client sur un créneau horaire spécifique.
-- Afficher les rooms disponibles pour un créneau donné.
+- Afficher les salles disponibles pour un créneau donné.
 - Afficher les réservations d'un client spécifique.
 
 ### **4. Interface utilisateur intuitive**
@@ -72,8 +72,14 @@ Avant de commencer, assurez-vous d'avoir les éléments suivants installés sur 
    ```bash
    python src/main.py
    ```
+   ou:
+
+   Pour lancer l'application, exécutez le script lancer_application.bat dans la console :
+  ```
+   lancer_application
+   ```
 2. Interface principale :
-   - **Accueil** : Vue d'ensemble des réservations et des rooms.
+   - **Accueil** : Vue d'ensemble des réservations et des salles.
    - **Ajouter** : Formulaires pour ajouter un client ou une salle.
    - **Réserver** : Interface pour réserver une salle pour un client.
    - **Afficher** : Consultation des réservations et des disponibilités.
