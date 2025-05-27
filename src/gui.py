@@ -725,19 +725,89 @@ def display_rooms_for_niche() -> None:
 
 
 def display_rooms_lists() -> None:
-    """Show the list of available rooms in a popup."""
+    """Displays the list of available rooms in the main window."""
+    # Clear the current section and create a new one for displaying rooms
+    for widget in root.winfo_children():
+        widget.destroy()
+
+    # Create a new frame for the room list section
+    frame = ttk.Frame(root, style="TFrame")
+    frame.pack(fill=tk.BOTH, expand=True)
+
+    # Section title for the list of rooms
+    ttk.Label(
+        frame,
+        text="Liste des Salles Disponibles",
+        font=("Helvetica", 16, "bold"),
+        background="#f0f8ff",
+    ).pack(pady=10)
+
+    # Fetch the list of available rooms
     rooms = display_available_rooms()
     if not rooms:
-        messagebox.showinfo("Information", "Aucune room disponible.")
+        ttk.Label(
+            frame,
+            text="Aucune salle disponible.",
+            font=("Helvetica", 12),
+            background="#f0f8ff",
+        ).pack(pady=20)
         return
 
-    texte = "\n".join(
-        [
-            f"Nom: {room['id']}, Type: {room['type']}, Capacité: {room['capacite']}"
-            for room in rooms
-        ]
-    )
-    messagebox.showinfo("Liste des salles", texte)
+    # Create a table to display the rooms
+    table_frame = ttk.Frame(frame)
+    table_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=10)
+
+    # Create headers for the table
+    headers = ["Nom", "Type", "Capacité"]
+    for col, header in enumerate(headers):
+        ttk.Label(
+            table_frame,
+            text=header,
+            font=("Helvetica", 12, "bold"),
+            borderwidth=1,
+            relief="solid",
+            anchor="center",
+            background="#d3d3d3",
+            width=20,
+        ).grid(row=0, column=col, sticky="nsew")
+
+    # Populate the table with room data
+    for row, room in enumerate(rooms, start=1):
+        ttk.Label(
+            table_frame,
+            text=room["id"],  # Room name
+            borderwidth=1,
+            relief="solid",
+            anchor="center",
+            background="#ffffff",
+        ).grid(row=row, column=0, sticky="nsew")
+        ttk.Label(
+            table_frame,
+            text=room["type"],  # Room type
+            borderwidth=1,
+            relief="solid",
+            anchor="center",
+            background="#ffffff",
+        ).grid(row=row, column=1, sticky="nsew")
+        ttk.Label(
+            table_frame,
+            text=room["capacite"],  # Room capacity
+            borderwidth=1,
+            relief="solid",
+            anchor="center",
+            background="#ffffff",
+        ).grid(row=row, column=2, sticky="nsew")
+
+    # Button to return to the main menu
+    button_frame = ttk.Frame(frame)
+    button_frame.pack(pady=20)
+    ttk.Button(
+        button_frame,
+        text="Retour",
+        command=menu_principal,  # Retourne au menu principal
+        style="Secondary.TButton",
+        width=20,
+    ).pack(side=tk.LEFT, padx=10)
 
 
 def display_clients() -> list:
