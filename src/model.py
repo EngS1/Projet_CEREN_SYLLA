@@ -24,3 +24,13 @@ def add_client(prenom, nom, email):
     data["client_id_counter"] = client_id
     save_data(data)
     return nouveau_client
+
+
+class Client:
+    """Represents a client in the system."""
+
+    def __init__(self, id: int, nom: str, prenom: str, email: str):
+        self.id = id
+        self.nom = nom
+        self.prenom = prenom
+        self.email = email

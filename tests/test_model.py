@@ -1,6 +1,6 @@
 import pytest
 import unittest
-from src.model import Client  # Exemple de classe à tester
+from src.model import Client
 
 
 class TestModel(unittest.TestCase):

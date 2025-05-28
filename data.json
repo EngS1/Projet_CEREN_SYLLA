@@ -1,5 +1,5 @@
 {
-    "client_id_counter": 10,
+    "client_id_counter": 11,
     "clients": [
         {
             "id": 1,
@@ -54,6 +54,12 @@
             "nom": "sonso",
             "prenom": "sncocn",
             "email": "daoude@gmail.com"
+        },
+        {
+            "id": 10,
+            "nom": "Ouat",
+            "prenom": "Hima",
+            "email": "hima@gmail.com"
         }
     ],
     "rooms": [

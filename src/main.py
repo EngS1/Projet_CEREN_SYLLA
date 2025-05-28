@@ -4,23 +4,22 @@ from datetime import datetime
 from email_validator import validate_email, EmailNotValidError
 
 
-"""Database managment"""
 clients = []
 rooms = []
 bookings = []
 client_id_counter = 0
 
 
-"""Initialisation de la base de données"""
+"""Add a client to the database"""
 
 
 def add_client(nom, prenom, email) -> dict:
     """Add a client to the database."""
     global clients, client_id_counter
-    client_id = client_id_counter  # Utilise le compteur actuel comme ID
+    client_id = client_id_counter
     client = {"id": client_id, "nom": nom, "prenom": prenom, "email": email}
     clients.append(client)
-    client_id_counter += 1  # Incrémente le compteur
+    client_id_counter += 1
     return client
 
 
@@ -29,7 +28,7 @@ def add_client(nom, prenom, email) -> dict:
 
 def add_room(nom_salle, type_salle, capacite) -> dict:
     nouvelle_salle = {
-        "id": nom_salle,  # L'ID est identique au nom
+        "id": nom_salle,
         "nom": nom_salle,
         "type": type_salle,
         "capacite": capacite,
@@ -118,6 +117,7 @@ def remove_room(salle_id) -> str:
 
 def display_clients() -> list:
     """Return a list of all registered clients."""
+    global clients
     return [(client["nom"], client["prenom"]) for client in clients]
 
 
@@ -178,3 +178,8 @@ def check_email(email):
         return True, v.email
     except EmailNotValidError:
         return False, "Email non valide"
+
+
+def main_function():
+    """Main function of the application."""
+    return "Application started"
