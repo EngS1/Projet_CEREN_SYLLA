@@ -1,5 +1,5 @@
 {
-    "client_id_counter": 9,
+    "client_id_counter": 10,
     "clients": [
         {
             "id": 1,
@@ -48,6 +48,12 @@
             "nom": "fehfe",
             "prenom": "dns\u0131d",
             "email": "aaaa@gmail.com"
+        },
+        {
+            "id": 9,
+            "nom": "sonso",
+            "prenom": "sncocn",
+            "email": "daoude@gmail.com"
         }
     ],
     "rooms": [
@@ -89,6 +95,13 @@
             "salle_id": "2025-05-22 10:15:00",
             "start_date": "2025-05-22 11:30:00",
             "end_date": "Salle3 - Conf\u00e9rence (Capacit\u00e9: 12)"
+        },
+        {
+            "id": "8d43cc8c-23b8-46cb-b0b0-671c060979b3",
+            "client_id": "S\u00e9lectionner un client",
+            "salle_id": "2025-05-28 08:00:00",
+            "start_date": "2025-05-28 12:30:00",
+            "end_date": "Salle1 - Standard (Capacit\u00e9: 4)"
         }
     ]
 }

@@ -443,55 +443,72 @@ def create_booking_section() -> None:
 
     """Load clients to the combobox."""
     ttk.Label(frame, text="salles disponibles", background="#f0f8ff").pack(pady=10)
-room_var = tk.StringVar()
-room_menu = ttk.Combobox(frame, textvariable=room_var, state="readonly", width=40)
-room_menu.pack(pady=5)
-error_room = ttk.Label(frame, text="", foreground="red", background="#f0f8ff")
-error_room.pack()
+    room_var = tk.StringVar()
+    room_menu = ttk.Combobox(frame, textvariable=room_var, state="readonly", width=40)
+    room_menu.pack(pady=5)
+    error_room = ttk.Label(frame, text="", foreground="red", background="#f0f8ff")
+    error_room.pack()
 
-def load_available_rooms() -> None:
-    """Load available rooms based on the selected date and time."""
-    start_date_str = entry_start_date.get().strip()
-    end_date_str = entry_end_date.get().strip()
+    def load_available_rooms() -> None:
+        """Load available rooms based on the selected date and time."""
+        start_date_str = entry_start_date.get().strip()
+        end_date_str = entry_end_date.get().strip()
+        start_date_obj = datetime.strptime(start_date_str, "%Y-%m-%d %H:%M:%S")
 
-        # Validation des champs de date
-        if not start_date_str:
-            error_start_date.config(text="Veuillez entrer une date de début valide.")
+        end_date_obj = datetime.strptime(end_date_str, "%Y-%m-%d %H:%M:%S")
+        start_date = start_date_obj.strftime("%Y-%m-%d")
+        end_date = end_date_obj.strftime("%Y-%m-%d")
+        start_hour = start_date_obj.strftime("%H:%M")
+        end_hour = end_date_obj.strftime("%H:%M")
+
+        """Reset error messages."""
+        error_start_date.config(text="")
+        error_end_date.config(text="")
+        error_room.config(text="")
+        error_client.config(text="")
+
+        """Validation of the form fields."""
+        erreurs = False
+        if not start_date:
+            error_start_date.config(text="Veuillez sélectionner une date de début.")
+            erreurs = True
+        if not end_date:
+            error_end_date.config(text="Veuillez sélectionner une date de fin.")
+            erreurs = True
+        if entry_client.get() == "Sélectionner un client":
+            error_client.config(text="Veuillez sélectionner un client.")
+            erreurs = True
+        if erreurs:
             return
-        if not end_date_str:
-            error_end_date.config(text="Veuillez entrer une date de fin valide.")
-            return
 
+        """Validation of the dates."""
         try:
-            # Conversion des chaînes en objets datetime
-            start_date_obj = datetime.strptime(start_date_str, "%Y-%m-%d %H:%M:%S")
-            end_date_obj = datetime.strptime(end_date_str, "%Y-%m-%d %H:%M:%S")
-        except ValueError:
-            error_start_date.config(text="Format de date invalide (YYYY-MM-DD HH:MM:SS).")
-            return
-
-        # Validation des dates
-        if start_date_obj >= end_date_obj:
-            error_end_date.config(
-                text="La date de fin doit être postérieure à la date de début."
-            )
-            return
-
-        # Charger les salles disponibles
-        try:
-            rooms = display_available_rooms_for_niche(start_date_str, end_date_str)
-            if not rooms:
-                error_room.config(text="Aucune salle disponible pour ce créneau.")
+            if start_date > end_date:
+                error_end_date.config(
+                    text="La date de fin doit être égale ou postérieure à la date de début."
+                )
                 return
+        except ValueError:
+            error_start_date.config(text="Format de date invalide (YYYY-MM-DD).")
+            return
 
-            # Mettre à jour la liste déroulante des salles disponibles
-            room_menu["values"] = [
-                f"{room['id']} - {room['type']} (Capacité: {room['capacite']})"
-                for room in rooms
-            ]
-            error_room.config(text="")  # Réinitialiser les erreurs
-        except Exception as e:
-            error_room.config(text=f"Erreur lors du chargement des salles : {e}")
+        """Validation of the time."""
+        try:
+            if start_hour >= end_hour:
+                error_end_date.config(
+                    text="L'heure de fin doit être supérieure à l'heure de début."
+                )
+                return
+        except ValueError:
+            error_start_date.config(text="Format d'heure invalide (HH:MM).")
+            return
+
+        """Load available rooms for the selected date and time."""
+        rooms = display_available_rooms_for_niche(start_date, end_date)
+        room_menu["values"] = [
+            f"{room['id']} - {room['type']} (Capacité: {room['capacite']})"
+            for room in rooms
+        ]
 
     ttk.Button(
         frame,
@@ -896,57 +913,84 @@ def display_client_list() -> None:
 
 def display_clients_bookings_gui() -> None:
     """Displays the bookings for a client directly in the main window."""
+    """ Clear the current section and create a new one for displaying bookings"""
     for widget in root.winfo_children():
         widget.destroy()
-    """Create a new frame for the client bookings section."""
+
+    """ Create a new frame for the client bookings section"""
     frame = ttk.Frame(root, style="TFrame")
     frame.pack(fill=tk.BOTH, expand=True)
 
+    """ Section title"""
     ttk.Label(
         frame,
-        text="Bookings for a Client",
+        text="Réservations pour un Client",
         font=("Helvetica", 16, "bold"),
         background="#f0f8ff",
     ).pack(pady=10)
 
-    """Label and entry for client ID input."""
-    ttk.Label(frame, text="Client ID:", background="#f0f8ff").pack(pady=5)
-    entry_client_id = ttk.Entry(frame, width=40)
-    entry_client_id.pack(pady=5)
+    """ Fetch the list of clients"""
+    clients = display_clients()
+    if not clients:
+        ttk.Label(
+            frame,
+            text="Aucun client enregistré.",
+            font=("Helvetica", 12),
+            background="#f0f8ff",
+        ).pack(pady=20)
+        return
 
-    """Frame to display the results of the bookings search."""
+    """ Create a combobox for selecting a client"""
+    ttk.Label(frame, text="Sélectionnez un client :", background="#f0f8ff").pack(pady=5)
+    client_var = tk.StringVar()
+    client_menu = ttk.Combobox(
+        frame,
+        textvariable=client_var,
+        state="readonly",
+        width=40,
+        values=[
+            f"{client['id']} - {client['nom']} {client['prenom']}" for client in clients
+        ],
+    )
+    client_menu.set("Sélectionner un client")
+    client_menu.pack(pady=5)
+
+    """ Frame to display the results of the bookings search"""
     results_frame = ttk.Frame(frame)
     results_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=10)
 
     def search_bookings() -> None:
-        """Searches for bookings based on the provided client ID."""
-        """Clear the results frame before displaying new results."""
+        """Searches for bookings based on the selected client."""
+        """ Clear the results frame before displaying new results"""
         for widget in results_frame.winfo_children():
             widget.destroy()
 
-        client_id = entry_client_id.get().strip()
-        if not client_id:
+        selected_client = client_var.get()
+        if not selected_client or selected_client == "Sélectionner un client":
             ttk.Label(
                 results_frame,
-                text="Please enter a client ID.",
+                text="Veuillez sélectionner un client.",
                 font=("Helvetica", 12),
                 foreground="red",
                 background="#f0f8ff",
             ).pack(pady=10)
             return
 
+        """ Extract the client ID from the selected value"""
+        client_id = selected_client.split(" - ")[0]
+
         try:
             bookings = display_clients_bookings(client_id)
             if not bookings:
                 ttk.Label(
                     results_frame,
-                    text="No bookings found for this client.",
+                    text="Aucune réservation trouvée pour ce client.",
                     font=("Helvetica", 12),
                     background="#f0f8ff",
                 ).pack(pady=10)
                 return
 
-            """Create headers for the bookings table."""
+            """ Create headers for the bookings table"""
             headers = ["Booking ID", "Room", "Start Date", "End Date"]
             for col, header in enumerate(headers):
                 ttk.Label(
@@ -960,11 +1004,10 @@ def display_clients_bookings_gui() -> None:
                     width=20,
                 ).grid(row=0, column=col, sticky="nsew")
 
-            """Populate the table with booking data."""
             for row, booking in enumerate(bookings, start=1):
                 ttk.Label(
                     results_frame,
-                    text=booking["id"],  # Booking ID
+                    text=booking["id"],
                     borderwidth=1,
                     relief="solid",
                     anchor="center",
@@ -972,7 +1015,7 @@ def display_clients_bookings_gui() -> None:
                 ).grid(row=row, column=0, sticky="nsew")
                 ttk.Label(
                     results_frame,
-                    text=booking["salle_id"],  # Room ID
+                    text=booking["salle_id"],
                     borderwidth=1,
                     relief="solid",
                     anchor="center",
@@ -980,7 +1023,7 @@ def display_clients_bookings_gui() -> None:
                 ).grid(row=row, column=1, sticky="nsew")
                 ttk.Label(
                     results_frame,
-                    text=booking["start_date"],  # Start Date
+                    text=booking["start_date"],
                     borderwidth=1,
                     relief="solid",
                     anchor="center",
@@ -988,7 +1031,7 @@ def display_clients_bookings_gui() -> None:
                 ).grid(row=row, column=2, sticky="nsew")
                 ttk.Label(
                     results_frame,
-                    text=booking["end_date"],  # End Date
+                    text=booking["end_date"],
                     borderwidth=1,
                     relief="solid",
                     anchor="center",
@@ -998,7 +1041,7 @@ def display_clients_bookings_gui() -> None:
         except Exception as e:
             ttk.Label(
                 results_frame,
-                text=f"Error during search: {e}",
+                text=f"Erreur lors de la recherche : {e}",
                 font=("Helvetica", 12),
                 foreground="red",
                 background="#f0f8ff",
