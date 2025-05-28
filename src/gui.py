@@ -443,72 +443,55 @@ def create_booking_section() -> None:
 
     """Load clients to the combobox."""
     ttk.Label(frame, text="salles disponibles", background="#f0f8ff").pack(pady=10)
-    room_var = tk.StringVar()
-    room_menu = ttk.Combobox(frame, textvariable=room_var, state="readonly", width=40)
-    room_menu.pack(pady=5)
-    error_room = ttk.Label(frame, text="", foreground="red", background="#f0f8ff")
-    error_room.pack()
+room_var = tk.StringVar()
+room_menu = ttk.Combobox(frame, textvariable=room_var, state="readonly", width=40)
+room_menu.pack(pady=5)
+error_room = ttk.Label(frame, text="", foreground="red", background="#f0f8ff")
+error_room.pack()
 
-    def load_available_rooms() -> None:
-        """Load available rooms based on the selected date and time."""
-        start_date_str = entry_start_date.get().strip()
-        end_date_str = entry_end_date.get().strip()
-        start_date_obj = datetime.strptime(start_date_str, "%Y-%m-%d %H:%M:%S")
+def load_available_rooms() -> None:
+    """Load available rooms based on the selected date and time."""
+    start_date_str = entry_start_date.get().strip()
+    end_date_str = entry_end_date.get().strip()
 
-        end_date_obj = datetime.strptime(end_date_str, "%Y-%m-%d %H:%M:%S")
-        start_date = start_date_obj.strftime("%Y-%m-%d")
-        end_date = end_date_obj.strftime("%Y-%m-%d")
-        start_hour = start_date_obj.strftime("%H:%M")
-        end_hour = end_date_obj.strftime("%H:%M")
-
-        """Reset error messages."""
-        error_start_date.config(text="")
-        error_end_date.config(text="")
-        error_room.config(text="")
-        error_client.config(text="")
-
-        """Validation of the form fields."""
-        erreurs = False
-        if not start_date:
-            error_start_date.config(text="Veuillez sélectionner une date de début.")
-            erreurs = True
-        if not end_date:
-            error_end_date.config(text="Veuillez sélectionner une date de fin.")
-            erreurs = True
-        if entry_client.get() == "Sélectionner un client":
-            error_client.config(text="Veuillez sélectionner un client.")
-            erreurs = True
-        if erreurs:
+        # Validation des champs de date
+        if not start_date_str:
+            error_start_date.config(text="Veuillez entrer une date de début valide.")
+            return
+        if not end_date_str:
+            error_end_date.config(text="Veuillez entrer une date de fin valide.")
             return
 
-        """Validation of the dates."""
         try:
-            if start_date > end_date:
-                error_end_date.config(
-                    text="La date de fin doit être égale ou postérieure à la date de début."
-                )
-                return
+            # Conversion des chaînes en objets datetime
+            start_date_obj = datetime.strptime(start_date_str, "%Y-%m-%d %H:%M:%S")
+            end_date_obj = datetime.strptime(end_date_str, "%Y-%m-%d %H:%M:%S")
         except ValueError:
-            error_start_date.config(text="Format de date invalide (YYYY-MM-DD).")
+            error_start_date.config(text="Format de date invalide (YYYY-MM-DD HH:MM:SS).")
             return
 
-        """Validation of the time."""
+        # Validation des dates
+        if start_date_obj >= end_date_obj:
+            error_end_date.config(
+                text="La date de fin doit être postérieure à la date de début."
+            )
+            return
+
+        # Charger les salles disponibles
         try:
-            if start_hour >= end_hour:
-                error_end_date.config(
-                    text="L'heure de fin doit être supérieure à l'heure de début."
-                )
+            rooms = display_available_rooms_for_niche(start_date_str, end_date_str)
+            if not rooms:
+                error_room.config(text="Aucune salle disponible pour ce créneau.")
                 return
-        except ValueError:
-            error_start_date.config(text="Format d'heure invalide (HH:MM).")
-            return
 
-        """Load available rooms for the selected date and time."""
-        rooms = display_available_rooms_for_niche(start_date, end_date)
-        room_menu["values"] = [
-            f"{room['id']} - {room['type']} (Capacité: {room['capacite']})"
-            for room in rooms
-        ]
+            # Mettre à jour la liste déroulante des salles disponibles
+            room_menu["values"] = [
+                f"{room['id']} - {room['type']} (Capacité: {room['capacite']})"
+                for room in rooms
+            ]
+            error_room.config(text="")  # Réinitialiser les erreurs
+        except Exception as e:
+            error_room.config(text=f"Erreur lors du chargement des salles : {e}")
 
     ttk.Button(
         frame,
