@@ -1,34 +1,123 @@
-# Projet_CEREN_SYLLA
+# **MeetingPro**
 
-## Description
-Le projet **CEREN_SYLLA** est une application Python qui combine une interface graphique (Tkinter) et une logique backend pour résoudre un problème spécifique ou fournir une fonctionnalité particulière. Ce projet est conçu pour être modulaire, testable et facile à maintenir.
+MeetingPro est une application de gestion de réservations de salles, développée en Python avec une interface graphique basée sur `tkinter`. Elle permet aux utilisateurs de gérer les clients, les salles, et les réservations de manière intuitive et efficace.
 
 ---
 
-## Structure du Projet
+## **Table des matières**
+1. [Fonctionnalités](#fonctionnalités)
+2. [Prérequis](#prérequis)
+3. [Installation](#installation)
+4. [Utilisation](#utilisation)
+5. [Structure du projet](#structure-du-projet)
+6. [Détails des fichiers](#détails-des-fichiers)
+7. [Contributeurs](#contributeurs)
+8. [Licence](#licence)
+
+---
+
+## **Fonctionnalités**
+
+### **1. Gestion des clients**
+- Ajouter un nouveau client avec son nom, prénom et email.
+- Afficher la liste des clients enregistrés.
+
+### **2. Gestion des salles**
+- Ajouter une salle avec un nom unique, un type (Standard, Conférence, Informatique) et une capacité.
+- Afficher la liste des salles disponibles.
+
+### **3. Réservations**
+- Réserver une salle pour un client sur un créneau horaire spécifique.
+- Afficher les salles disponibles pour un créneau donné.
+- Afficher les réservations d'un client spécifique.
+
+### **4. Interface utilisateur intuitive**
+- Interface en français avec des boutons clairs et des formulaires simples.
+- Navigation facile entre les différentes sections : Accueil, Ajouter, Réserver, Afficher.
+
+### **5. Journalisation**
+- Utilisation du module `logging` pour suivre les actions importantes et les erreurs dans la console.
+
+---
+
+## **Prérequis**
+
+Avant de commencer, assurez-vous d'avoir les éléments suivants installés sur votre machine :
+
+1. **Python 3.10 ou supérieur** : Téléchargez-le depuis [python.org](https://www.python.org/).
+2. **Modules Python nécessaires** :
+   - `tkinter` (inclus par défaut avec Python)
+   - `tkcalendar`
+   - `logging`
+
+---
+
+## **Installation**
+
+1. Clonez le dépôt GitHub :
+   ```bash
+   git clone https://github.com/EngS1/Projet_CEREN_SYLLA.git
+   cd Projet_CEREN_SYLLA
+   ```
+2. Installez les dépendances nécessaires :
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+---
+
+## **Utilisation**
+
+1. Exécutez l'application :
+   ```bash
+   python src/main.py
+   ```
+   ou:
+
+   Pour lancer l'application, exécutez le script lancer_application.bat dans la console :
+  ```
+   lancer_application
+   ```
+2. Interface principale :
+   - **Accueil** : Vue d'ensemble des réservations et des salles.
+   - **Ajouter** : Formulaires pour ajouter un client ou une salle.
+   - **Réserver** : Interface pour réserver une salle pour un client.
+   - **Afficher** : Consultation des réservations et des disponibilités.
+
+---
+
+## **Structure du projet**
 
 Voici la structure détaillée du projet :
 
 ```
 Projet_CEREN_SYLLA
 ├── src
-│   ├── main.py          # Contient la logique principale du projet
-│   ├── gui.py           # Interface graphique développée avec Tkinter
-│   ├── utils.py         # Fonctions utilitaires réutilisables
-│   └── __init__.py      # Permet de traiter le dossier comme un package Python
+│   ├── gui.py                # Interface graphique développée avec Tkinter
+│   ├── main.py               # Logique principale du projet
+│   ├── controller.py         # Contrôleur pour gérer les interactions entre la vue et le modèle
+│   ├── model.py              # Modèle pour gérer les données et la logique métier
+│   ├── database.py           # Gestion des données (lecture/écriture dans data.json)
+│   ├── utils.py              # Fonctions utilitaires réutilisables
+│   └── __init__.py           # Permet de traiter le dossier comme un package Python
 ├── tests
-│   ├── test_main.py     # Tests unitaires pour les fonctions de main.py
-│   ├── test_gui.py      # Tests unitaires pour l'interface graphique
-│   ├── test_utils.py    # Tests unitaires pour les fonctions utilitaires
-│   └── __init__.py      # Permet de traiter le dossier comme un package Python
-├── requirements.txt      # Liste des dépendances nécessaires
-├── README.md             # Documentation complète du projet
-└── .gitignore            # Fichier pour ignorer certains fichiers/dossiers dans Git
+│   ├── test_main.py          # Tests unitaires pour les fonctions de main.py
+│   ├── test_gui.py           # Tests unitaires pour l'interface graphique
+│   ├── test_controller.py    # Tests unitaires pour le contrôleur
+│   ├── test_model.py         # Tests unitaires pour le modèle
+│   ├── test_database.py      # Tests unitaires pour la gestion des données
+│   └── __init__.py           # Permet de traiter le dossier comme un package Python
+├── data.json                 # Fichier JSON pour stocker les données
+├── requirements.txt          # Liste des dépendances nécessaires
+├── pyproject.toml            # Configuration du projet
+├── lancer_application.bat    # Script pour lancer l'application sur Windows
+├── README.md                 # Documentation complète du projet
+└── .gitignore                # Fichier pour ignorer certains fichiers/dossiers dans Git
 ```
 
-### Détails des fichiers et dossiers
+## **Détails des fichiers**
 
-#### 1. **Dossier `src`**
+### 1. **Dossier `src`**
 Ce dossier contient tout le code source de l'application.
 
 - **`main.py`**  
@@ -44,13 +133,22 @@ Ce dossier contient tout le code source de l'application.
   - Champs de saisie pour entrer des données.
   - Affichage des résultats.
 
+- **`controller.py`**  
+  Gère les interactions entre la vue (interface graphique) et le modèle (logique métier, données). Ce fichier contient les fonctions qui répondent aux actions de l'utilisateur et mettent à jour l'affichage en conséquence.
+
+- **`model.py`**  
+  Définit la structure des données et les fonctions associées pour manipuler ces données. Il contient également la logique métier de l'application.
+
+- **`database.py`**  
+  Gère la lecture et l'écriture des données dans le fichier `data.json`. Il s'assure que les données sont correctement formatées et stockées.
+
 - **`utils.py`**  
   Contient des fonctions utilitaires ou des outils réutilisables pour le projet.  
   **Exemple de fonctions :**
   - `def validate_input(data):` : Valide les données saisies par l'utilisateur.
   - `def format_output(result):` : Formate les résultats pour l'affichage.
 
-#### 2. **Dossier `tests`**
+### 2. **Dossier `tests`**
 Ce dossier contient tous les tests unitaires pour vérifier le bon fonctionnement du projet.
 
 - **`test_main.py`**  
@@ -65,40 +163,27 @@ Ce dossier contient tous les tests unitaires pour vérifier le bon fonctionnemen
   - Vérification que les boutons déclenchent les bonnes actions.
   - Validation des données saisies par l'utilisateur.
 
-- **`test_utils.py`**  
-  Teste les fonctions utilitaires définies dans `utils.py`.  
-  **Exemple de tests :**
-  - Vérification de la validation des données.
-  - Vérification du formatage des résultats.
+- **`test_controller.py`**  
+  Teste les fonctions définies dans `controller.py`. Vérifie que les interactions entre la vue et le modèle se déroulent comme prévu.
 
-#### 3. **`requirements.txt`**
+- **`test_model.py`**  
+  Teste les fonctions de manipulation des données définies dans `model.py`. Assure que la logique métier est correctement implémentée.
+
+- **`test_database.py`**  
+  Teste les fonctions de lecture et d'écriture dans `data.json` définies dans `database.py`. Vérifie l'intégrité et le format des données.
+
+### 3. **`requirements.txt`**
 Ce fichier contient toutes les dépendances nécessaires pour exécuter le projet.  
 **Exemple :**
 
-#### 4. **`README.md`**
+### 4. **`README.md`**
 Ce fichier (le fichier actuel) contient une description complète du projet, y compris sa structure, ses fonctionnalités et les instructions pour l'installation et l'exécution.
 
-#### 5. **`.gitignore`**
+### 5. **`.gitignore`**
 Ce fichier est utilisé pour ignorer certains fichiers ou dossiers dans Git.
 
 ---
 
-## Fonctionnalités
+## **Contributeurs**
 
-1. **Interface Graphique (Tkinter)**  
-   - Affichage d'une interface utilisateur intuitive.
-   - Interaction avec l'utilisateur via des boutons, des champs de saisie et des étiquettes.
-   - Communication avec le backend pour afficher les résultats.
-
-2. **Logique Backend**  
-   - Traitement des données saisies par l'utilisateur.
-   - Calculs ou traitements spécifiques au projet.
-   - Retour des résultats à l'interface graphique.
-
-3. **Tests Unitaires**  
-   - Vérification de la validité des fonctions backend.
-   - Tests des interactions de l'interface graphique.
-   - Validation des fonctions utilitaires.
-
----
-
+- **CEREN MUHAMMED ET SYLLA DAOUDA**  - [EngS1] (https://github.com/EngS1)

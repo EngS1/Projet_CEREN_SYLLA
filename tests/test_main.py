@@ -1,19 +1,56 @@
+import unittest
 import pytest
-from main import ajouter_client, ajouter_salle, reserver_salle, verifier_disponibilite_salle
+import json
+import os
+from src.main import main_function, display_clients, load_data
 
-def test_ajouter_client():
-    client = ajouter_client("Jean Dupont", "jean.dupont@example.com")
-    assert client["nom"] == "Jean Dupont"
-    assert client["email"] == "jean.dupont@example.com"
+"""Test suite for the main application."""
+clients = []
 
-def test_ajouter_salle():
-    salle = ajouter_salle("Salle A", "standard", 4)
-    assert salle["nom"] == "Salle A"
-    assert salle["type"] == "standard"
-    assert salle["capacite"] == 4
 
-def test_verifier_disponibilite_salle():
-    salle_id = "1"
-    reserver_salle("client1", salle_id, "2025-05-01T10:00:00", "2025-05-01T12:00:00")
-    assert not verifier_disponibilite_salle(salle_id, "2025-05-01T11:00:00", "2025-05-01T13:00:00")
-    assert verifier_disponibilite_salle(salle_id, "2025-05-01T12:00:00", "2025-05-01T14:00:00")
+class TestMain(unittest.TestCase):
+    def test_main_function(self):
+        """Test the main function."""
+        result = main_function()
+        self.assertIsNotNone(result)
+        self.assertEqual(result, "Application started")
+
+
+def test_load_data():
+    """Test the load_data function."""
+    global clients, rooms, bookings, client_id_counter
+    test_file = "test_data.json"
+    test_data = {
+        "clients": [{"nom": "John", "prenom": "Doe"}],
+        "rooms": [],
+        "bookings": [],
+        "client_id_counter": 1,
+    }
+
+    with open(test_file, "w") as f:
+        json.dump(test_data, f)
+
+    load_data(test_file)
+
+    assert clients == test_data["clients"]
+    assert rooms == test_data["rooms"]
+    assert bookings == test_data["bookings"]
+    assert client_id_counter == test_data["client_id_counter"]
+
+    os.remove(test_file)
+
+
+def test_display_clients():
+    """Test the display_clients function."""
+    global clients
+    clients = [
+        {"id": "1", "nom": "John", "prenom": "Doe", "email": "doe@gmail.com"},
+        {"id": "2", "nom": "Jane", "prenom": "Smith", "email": "aaaa@gmail.com"},
+    ]
+    result = display_clients()
+    assert result == [("John", "Doe"), ("Jane", "Smith")]
+
+
+if __name__ == "__main__":
+    unittest.main()
+    pytest.main(["-v", __file__])

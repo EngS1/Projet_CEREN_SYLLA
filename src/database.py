@@ -1,9 +1,20 @@
-from utils import charger_donnees, sauvegarder_donnees
+from src.utils import load_data, save_data
 
-FICHIER_BDD = "data/database.json"
+"""Managment of the database for the reservation system."""
+FICHIER_BDD = "data.json"
 
-def lire_bdd():
-    return charger_donnees(FICHIER_BDD)
 
-def ecrire_bdd(donnees):
-    sauvegarder_donnees(FICHIER_BDD, donnees)
+def lire_bdd() -> dict:
+    """Reads the database from the JSON file."""
+    return load_data(FICHIER_BDD)
+
+
+def ecrire_bdd(donnees: dict) -> None:
+    """Writes the database to the JSON file."""
+    save_data(FICHIER_BDD, donnees)
+
+
+def get_clients() -> list:
+    """Retrieve the list of clients from the database."""
+    data = lire_bdd()
+    return data.get("clients", [])
