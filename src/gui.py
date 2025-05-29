@@ -12,6 +12,7 @@ from main import (
     display_clients,
     book_room,
     display_available_rooms_for_niche,
+    parse_salle_info,
     display_clients_bookings,
     load_data,
     save_data,
@@ -319,8 +320,6 @@ def create_add_section() -> ttk.Frame:
 
 
 """Function to open a calendar popup for date and time selection."""
-
-
 def open_calendar(entry, parent_window):
     """Opens a calendar popup to select a date and time."""
     top = tk.Toplevel(parent_window)
@@ -456,8 +455,8 @@ def create_booking_section() -> None:
         start_date_obj = datetime.strptime(start_date_str, "%Y-%m-%d %H:%M:%S")
 
         end_date_obj = datetime.strptime(end_date_str, "%Y-%m-%d %H:%M:%S")
-        start_date = start_date_obj.strftime("%Y-%m-%d")
-        end_date = end_date_obj.strftime("%Y-%m-%d")
+        start_date = datetime(start_date_obj.year, start_date_obj.month, start_date_obj.day)
+        end_date = datetime(end_date_obj.year, end_date_obj.month, end_date_obj.day)
         start_hour = start_date_obj.strftime("%H:%M")
         end_hour = end_date_obj.strftime("%H:%M")
 
@@ -504,7 +503,7 @@ def create_booking_section() -> None:
             return
 
         """Load available rooms for the selected date and time."""
-        rooms = display_available_rooms_for_niche(start_date, end_date)
+        rooms = display_available_rooms_for_niche(start_date_obj, end_date_obj)
         room_menu["values"] = [
             f"{room['id']} - {room['type']} (Capacité: {room['capacite']})"
             for room in rooms
@@ -553,16 +552,12 @@ def create_booking_section() -> None:
         if room_menu.get() == "":
             error_room.config(text="Veuillez sélectionner une room.")
             return
-        book_room(
-            entry_client.get(),
-            entry_start_date.get(),
-            entry_end_date.get(),
-            room_var.get(),
-        )
+        
         """Get the client name, start date, end date, and duration."""
         cliient_name = entry_client.get()
         start_date = entry_start_date.get()
         end_date = entry_end_date.get()
+        
         """Calculate the duration of the reservation."""
         try:
             d1 = datetime.strptime(start_date, "%Y-%m-%d %H:%M:%S")
@@ -570,6 +565,16 @@ def create_booking_section() -> None:
             duration = str(d2 - d1)
         except Exception:
             duration = "Inconnue"
+        
+        """Check if the client is selected."""
+        book_room(
+            entry_client.get(),
+            room_var.get(),
+            entry_start_date.get(),
+            entry_end_date.get(),
+            duration,
+        )
+        
         """Get the selected room information."""
         room_info = room_var.get()
         if room_info:
@@ -657,7 +662,7 @@ def create_display_section() -> ttk.Frame:
     ttk.Button(
         button_frame,
         text="Afficher les salles disponibles pour un créneau",
-        command=display_rooms_for_niche,
+        command=display_available_rooms_for_niche_gui,
         width=45,
         style="Accent.TButton",
     ).pack(pady=10)
@@ -673,56 +678,136 @@ def create_display_section() -> ttk.Frame:
 
     return frame
 
+def display_available_rooms_for_niche_gui():
+    """Interface to display available rooms for a specific time slot."""
+    # Clear the current section and create a new one for displaying available rooms
+    for widget in root.winfo_children():
+        widget.destroy()
 
-def display_rooms_for_niche() -> None:
-    """Show a popup to find available rooms for a time slot."""
-    top = tk.Toplevel(root)
-    top.title("rooms disponibles pour un créneau")
-    top.geometry("400x300")
+    # Recreate the content frame
+    content_frame = ttk.Frame(root, style="TFrame")
+    content_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
 
-    ttk.Label(top, text="Date de début (YYYY-MM-DD):").pack(pady=5)
-    entry_start_date = ttk.Entry(top, width=30)
-    entry_start_date.pack(pady=5)
+    # Frame for controls 
+    controls_frame = ttk.Frame(content_frame)
+    controls_frame.pack(fill=tk.X, pady=10)
 
-    ttk.Label(top, text="Date de fin (YYYY-MM-DD):").pack(pady=5)
-    entry_end_date = ttk.Entry(top, width=30)
-    entry_end_date.pack(pady=5)
+    # Frame for dates
+    dates_frame = ttk.Frame(controls_frame)
+    dates_frame.pack(pady=10)
 
-    ttk.Label(top, text="Heure de début (HH:MM):").pack(pady=5)
-    entry_start_hour = ttk.Entry(top, width=30)
-    entry_start_hour.pack(pady=5)
+    # Frame for start dates
+    debut_frame = ttk.Frame(dates_frame)
+    debut_frame.pack(side=tk.LEFT, padx=20, pady=5)
 
-    ttk.Label(top, text="Heure de fin (HH:MM):").pack(pady=5)
-    entry_end_hour = ttk.Entry(top, width=30)
-    entry_end_hour.pack(pady=5)
+    # Selection of the start date
+    ttk.Label(debut_frame, text="Date de début", background="#f0f8ff").pack(pady=5)
+    
+    entry_frame_debut = ttk.Frame(debut_frame)
+    entry_frame_debut.pack()
+    
+    entry_start_date = ttk.Entry(entry_frame_debut, width=25)
+    entry_start_date.pack(side=tk.LEFT, padx=5)
+    
+    ttk.Button(
+        entry_frame_debut,
+        text="📅 Choisir",
+        command=lambda: open_calendar(entry_start_date, root),
+        width=10,
+        style="Accent.TButton",
+    ).pack(side=tk.LEFT)
 
-    def rechercher_rooms() -> None:
-        """Search for available rooms based on the provided date and time."""
-        start_date = entry_start_date.get().strip()
-        end_date = entry_end_date.get().strip()
-        start_hour = entry_start_hour.get().strip()
-        end_hour = entry_end_hour.get().strip()
+    error_date_debut = ttk.Label(
+        debut_frame, text="", foreground="red", background="#f0f8ff")
+    error_date_debut.pack()
+
+    # Frame for the end dates
+    fin_frame = ttk.Frame(dates_frame)
+    fin_frame.pack(side=tk.LEFT, padx=20, pady=5)
+
+    # Selection of the end date
+    ttk.Label(fin_frame, text="Date de fin", background="#f0f8ff").pack(pady=5)
+    
+    entry_frame_fin = ttk.Frame(fin_frame)
+    entry_frame_fin.pack()
+    
+    entry_end_date = ttk.Entry(entry_frame_fin, width=25)
+    entry_end_date.pack(side=tk.LEFT, padx=5)
+    
+    ttk.Button(
+        entry_frame_fin,
+        text="📅 Choisir",
+        command=lambda: open_calendar(entry_end_date, root),
+        width=10,
+        style="Accent.TButton",
+    ).pack(side=tk.LEFT)
+
+    error_date_fin = ttk.Label(
+        fin_frame, text="", foreground="red", background="#f0f8ff")
+    error_date_fin.pack()
+
+    # Frame for search button
+    button_frame = ttk.Frame(controls_frame)
+    button_frame.pack(pady=10)
+    
+    # Frame for results
+    results_frame = ttk.Frame(content_frame)
+    results_frame.pack(fill=tk.BOTH, expand=True)
+
+    def seek_rooms():
+        # Clean the results frame before displaying new results
+        for widget in results_frame.winfo_children():
+            widget.destroy()
+
+        start_date_str = entry_start_date.get().strip()
+        end_start_str = entry_end_date.get().strip()
 
         try:
-            rooms = display_available_rooms_for_niche(start_date, end_date)
-            if not rooms:
-                messagebox.showinfo(
-                    "Résultat", "Aucune salle disponible pour ce créneau."
-                )
+            start_date__obj = datetime.strptime(start_date_str, "%Y-%m-%d %H:%M:%S")
+            end_date_obj = datetime.strptime(end_start_str, "%Y-%m-%d %H:%M:%S")
+
+            available_room = display_available_rooms_for_niche(
+                start_date__obj, end_date_obj)
+
+            if not available_room:
+                ttk.Label(results_frame, text="Aucune salle disponible pour ce créneau.").pack(pady=50)
                 return
 
-            texte = "\n".join(
-                [
-                    f"Nom: {room['id']}, Type: {room['type']}, Capacité: {room['capacite']}"
-                    for room in rooms
-                ]
-            )
-            messagebox.showinfo("rooms disponibles", texte)
+            # Création du tableau des résultats
+            tree = ttk.Treeview(results_frame, columns=("salle", "type", "capacite"), show="headings", height=10)
+            tree.heading("salle", text="Salle")
+            tree.heading("type", text="Type")
+            tree.heading("capacite", text="Capacité")
+
+            for salle in available_room:
+                tree.insert("", tk.END, values=(salle["id"], salle["type"], salle["capacite"]))
+
+            scrollbar = ttk.Scrollbar(results_frame, orient="vertical", command=tree.yview)
+            tree.configure(yscrollcommand=scrollbar.set)
+
+            tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+            scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+        except ValueError as e:
+            messagebox.showerror("Erreur", f"Format de date invalide. Utilisez YYYY-MM-DD HH:MM:SS\n{str(e)}")
         except Exception as e:
-            messagebox.showerror("Erreur", f"Erreur lors de la recherche : {e}")
+            messagebox.showerror("Erreur", f"Une erreur est survenue: {str(e)}")
 
-    ttk.Button(top, text="Rechercher", command=rechercher_rooms).pack(pady=10)
-
+    # Button to search for available rooms
+    ttk.Button(
+        button_frame,
+        text="Rechercher les salles disponibles",
+        command=seek_rooms,
+        style="Accent.TButton",
+    ).pack(pady=10)
+    
+    # Button to return to the main menu
+    ttk.Button(
+        button_frame,
+        text="Retour",
+        command=menu_principal,
+        style="Accent.TButton",
+    ).pack(pady=10)
 
 def display_rooms_lists() -> None:
     """Displays the list of available rooms in the main window."""
@@ -804,17 +889,10 @@ def display_rooms_lists() -> None:
     ttk.Button(
         button_frame,
         text="Retour",
-        command=menu_principal,  # Retourne au menu principal
+        command=menu_principal,  # Return to the main menu
         style="Secondary.TButton",
         width=20,
     ).pack(side=tk.LEFT, padx=10)
-
-
-def display_clients() -> list:
-    """Returns the list of clients from the JSON file."""
-    with open("data.json", "r") as file:
-        data = json.load(file)
-    return data.get("clients", [])
 
 
 def display_client_list() -> None:
@@ -991,7 +1069,7 @@ def display_clients_bookings_gui() -> None:
                 return
 
             """ Create headers for the bookings table"""
-            headers = ["Booking ID", "Room", "Start Date", "End Date"]
+            headers = ["Salle", "Type", "Capacité", "Début", "Fin", "Durée"]
             for col, header in enumerate(headers):
                 ttk.Label(
                     results_frame,
@@ -1001,26 +1079,39 @@ def display_clients_bookings_gui() -> None:
                     relief="solid",
                     anchor="center",
                     background="#d3d3d3",
-                    width=20,
+                    width=12,
                 ).grid(row=0, column=col, sticky="nsew")
 
             for row, booking in enumerate(bookings, start=1):
+                salle, type_salle, capacite = parse_salle_info(booking["salle_id"])
+    
                 ttk.Label(
                     results_frame,
-                    text=booking["id"],
+                        text=salle,
                     borderwidth=1,
                     relief="solid",
                     anchor="center",
                     background="#ffffff",
                 ).grid(row=row, column=0, sticky="nsew")
+
                 ttk.Label(
                     results_frame,
-                    text=booking["salle_id"],
+                    text=type_salle,
                     borderwidth=1,
                     relief="solid",
                     anchor="center",
                     background="#ffffff",
                 ).grid(row=row, column=1, sticky="nsew")
+
+                ttk.Label(
+                    results_frame,
+                    text=capacite,
+                    borderwidth=1,
+                    relief="solid",
+                    anchor="center",
+                    background="#ffffff",
+                ).grid(row=row, column=2, sticky="nsew")
+
                 ttk.Label(
                     results_frame,
                     text=booking["start_date"],
@@ -1028,7 +1119,8 @@ def display_clients_bookings_gui() -> None:
                     relief="solid",
                     anchor="center",
                     background="#ffffff",
-                ).grid(row=row, column=2, sticky="nsew")
+                ).grid(row=row, column=3, sticky="nsew")
+
                 ttk.Label(
                     results_frame,
                     text=booking["end_date"],
@@ -1036,7 +1128,16 @@ def display_clients_bookings_gui() -> None:
                     relief="solid",
                     anchor="center",
                     background="#ffffff",
-                ).grid(row=row, column=3, sticky="nsew")
+                ).grid(row=row, column=4, sticky="nsew")
+
+                ttk.Label(
+                    results_frame,
+                    text=booking.get("duration", ""),
+                    borderwidth=1,
+                    relief="solid",
+                    anchor="center",
+                    background="#ffffff",
+                ).grid(row=row, column=5, sticky="nsew")
 
         except Exception as e:
             ttk.Label(

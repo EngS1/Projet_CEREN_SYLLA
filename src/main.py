@@ -2,6 +2,8 @@ import uuid
 import json
 from datetime import datetime
 from email_validator import validate_email, EmailNotValidError
+from datetime import datetime
+import re
 
 
 clients = []
@@ -47,7 +49,7 @@ def display_available_rooms():
 """Reserve a room for a client"""
 
 
-def book_room(client_id, salle_id, start_date, end_date) -> dict:
+def book_room(client_id, salle_id, start_date, end_date, duration) -> dict:
     reservation_id = str(uuid.uuid4())
     reservation = {
         "id": reservation_id,
@@ -55,6 +57,7 @@ def book_room(client_id, salle_id, start_date, end_date) -> dict:
         "salle_id": salle_id,
         "start_date": start_date,
         "end_date": end_date,
+        "duration": duration,
     }
     bookings.append(reservation)
     return reservation
@@ -64,20 +67,29 @@ def book_room(client_id, salle_id, start_date, end_date) -> dict:
 
 
 def display_clients_bookings(client_id) -> list:
-    return [res for res in bookings if res["client_id"] == client_id]
+    return [
+        res for res in bookings
+        if (res["client_id"].split("'id': ")[1].split(",")[0]) == client_id
+    ]
 
 
 """Show all bookings for a room"""
 
-
 def check_room_availability(salle_id, start_date, end_date) -> bool:
-    """Check if a room is available for a given time slot."""
     for res in bookings:
-        if res["salle_id"] == salle_id and not (
-            end_date <= res["start_date"] or start_date >= res["end_date"]
-        ):
-            return False
+        # Extract the ID
+        booked_salle_id = res["salle_id"].split(" - ")[0]
+        if booked_salle_id == salle_id:
+            res_start = datetime.strptime(res["start_date"], "%Y-%m-%d %H:%M:%S")
+            res_end = datetime.strptime(res["end_date"], "%Y-%m-%d %H:%M:%S")
+
+            print(f"Booking: {res_start} - {res_end}, Requested: {start_date} - {end_date}")
+
+            if not (end_date <= res_start or start_date >= res_end):
+                print(f"Overlap detected! {res['salle_id'] }not available.")
+                return False
     return True
+
 
 
 """Show available rooms for a specific time slot"""
@@ -85,11 +97,26 @@ def check_room_availability(salle_id, start_date, end_date) -> bool:
 
 def display_available_rooms_for_niche(start_date, end_date) -> list:
     """Return a list of available rooms for a specific time slot."""
-    rooms_disponibles = []
+    rooms_available = []
     for salle in rooms:
         if check_room_availability(salle["id"], start_date, end_date):
-            rooms_disponibles.append(salle)
-    return rooms_disponibles
+            rooms_available.append(salle)
+    return rooms_available
+
+
+
+"""Parse room information from a string"""
+
+
+def parse_salle_info(salle_str):
+    try:
+        salle = salle_str.split(" - ")[0]
+        type_salle = salle_str.split(" - ")[1].split(" (")[0]
+        capacite_match = re.search(r"Capacit(?:é|e): (\d+)", salle_str)
+        capacite = capacite_match.group(1) if capacite_match else ""
+    except Exception:
+        salle = type_salle = capacite = ""
+    return salle, type_salle, capacite
 
 
 """Delete a reservation"""
@@ -116,9 +143,11 @@ def remove_room(salle_id) -> str:
 
 
 def display_clients() -> list:
-    """Return a list of all registered clients."""
-    global clients
-    return [(client["nom"], client["prenom"]) for client in clients]
+    """Returns the list of clients from the JSON file."""
+    # with open("data.json", "r") as file:
+    #     data = json.load(file)
+    # return data.get("clients", [])
+    return [client for client in clients]
 
 
 """Display all registered rooms"""

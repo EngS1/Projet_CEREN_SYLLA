@@ -1,113 +1,77 @@
 {
-    "client_id_counter": 11,
+    "client_id_counter": 4,
     "clients": [
         {
             "id": 1,
             "nom": "Ceren",
             "prenom": "Muhammed",
-            "email": "misndf@outlook.fr"
+            "email": "libcv@gmail.com"
         },
         {
             "id": 2,
-            "nom": "asd",
-            "prenom": "ad",
-            "email": "a@gmail.com"
+            "nom": "test",
+            "prenom": "test",
+            "email": "test@outlook.fr"
         },
         {
             "id": 3,
-            "nom": "a",
-            "prenom": "ds",
-            "email": "b@gmail.com"
-        },
-        {
-            "id": 4,
-            "nom": "a",
-            "prenom": "ds",
-            "email": "b@gmail.com"
-        },
-        {
-            "id": 5,
-            "nom": "a",
-            "prenom": "ds",
-            "email": "b@gmail.com"
-        },
-        {
-            "id": 6,
-            "nom": "xmsp",
-            "prenom": "cm",
-            "email": "aaa@cms.com"
-        },
-        {
-            "id": 7,
-            "nom": "scmkp",
-            "prenom": "scnscpnq",
-            "email": "cm@gmail.com"
-        },
-        {
-            "id": 8,
-            "nom": "fehfe",
-            "prenom": "dns\u0131d",
-            "email": "aaaa@gmail.com"
-        },
-        {
-            "id": 9,
-            "nom": "sonso",
-            "prenom": "sncocn",
-            "email": "daoude@gmail.com"
-        },
-        {
-            "id": 10,
-            "nom": "Ouat",
-            "prenom": "Hima",
-            "email": "hima@gmail.com"
+            "nom": "akhy",
+            "prenom": "potter",
+            "email": "jgmi@gmail.com"
         }
     ],
     "rooms": [
         {
-            "id": "Salle1",
-            "nom": "Salle1",
+            "id": "Salle 1",
+            "nom": "Salle 1",
+            "type": "Conf\u00e9rence",
+            "capacite": 6
+        },
+        {
+            "id": "Salle 2",
+            "nom": "Salle 2",
             "type": "Standard",
             "capacite": 4
         },
         {
-            "id": "Salle2",
-            "nom": "Salle2",
+            "id": "Salle 3",
+            "nom": "Salle 3",
             "type": "Informatique",
-            "capacite": 6
-        },
-        {
-            "id": "Salle3",
-            "nom": "Salle3",
-            "type": "Conf\u00e9rence",
-            "capacite": 12
-        },
-        {
-            "id": "sda",
-            "nom": "sda",
-            "type": "Conf\u00e9rence",
-            "capacite": 5
-        },
-        {
-            "id": "sda2",
-            "nom": "sda2",
-            "type": "Conf\u00e9rence",
-            "capacite": 3
+            "capacite": 4
         }
     ],
     "bookings": [
         {
-            "id": "db9973db-8400-49c5-a9e5-5ba893943f76",
-            "client_id": "a ds",
-            "salle_id": "2025-05-22 10:15:00",
-            "start_date": "2025-05-22 11:30:00",
-            "end_date": "Salle3 - Conf\u00e9rence (Capacit\u00e9: 12)"
+            "id": "2359daae-efdb-48bd-b4c6-e75ced60fd8b",
+            "client_id": "{'id': 1, 'nom': 'Ceren', 'prenom': 'Muhammed', 'email': 'libcv@gmail.com'}",
+            "salle_id": "Salle 1 - Conf\u00e9rence (Capacit\u00e9: 6)",
+            "start_date": "2025-05-28 09:00:00",
+            "end_date": "2025-05-30 17:45:00",
+            "duration": "2 days, 8:45:00"
         },
         {
-            "id": "8d43cc8c-23b8-46cb-b0b0-671c060979b3",
-            "client_id": "S\u00e9lectionner un client",
-            "salle_id": "2025-05-28 08:00:00",
-            "start_date": "2025-05-28 12:30:00",
-            "end_date": "Salle1 - Standard (Capacit\u00e9: 4)"
+            "id": "5ef3d065-7c94-4442-b72c-42a3d46a5976",
+            "client_id": "{'id': 2, 'nom': 'test', 'prenom': 'test', 'email': 'test@outlook.fr'}",
+            "salle_id": "Salle 2 - Standard (Capacit\u00e9: 4)",
+            "start_date": "2025-05-29 10:00:00",
+            "end_date": "2025-05-29 12:00:00",
+            "duration": "2:00:00"
+        },
+        {
+            "id": "4586f24b-b2af-473e-a618-6b7cd979e167",
+            "client_id": "{'id': 3, 'nom': 'akhy', 'prenom': 'potter', 'email': 'jgmi@gmail.com'}",
+            "salle_id": "Salle 2 - Standard (Capacit\u00e9: 4)",
+            "start_date": "2025-05-29 11:45:00",
+            "end_date": "2025-05-29 15:15:00",
+            "duration": "3:30:00"
+        },
+        {
+            "id": "8e5febbe-ea1e-4dfa-8d03-593014afc462",
+            "client_id": "{'id': 2, 'nom': 'test', 'prenom': 'test', 'email': 'test@outlook.fr'}",
+            "salle_id": "Salle 3 - Informatique (Capacit\u00e9: 4)",
+            "start_date": "2025-05-29 11:30:00",
+            "end_date": "2025-05-29 16:15:00",
+            "duration": "4:45:00"
         }
     ]
 }
