@@ -96,32 +96,28 @@
     ],
     "bookings": [
         {
-            "id": "db9973db-8400-49c5-a9e5-5ba893943f76",
-            "client_id": "a ds",
-            "salle_id": "2025-05-22 10:15:00",
-            "start_date": "2025-05-22 11:30:00",
-            "end_date": "Salle3 - Conf\u00e9rence (Capacit\u00e9: 12)"
-        },
-        {
-            "id": "8d43cc8c-23b8-46cb-b0b0-671c060979b3",
-            "client_id": "S\u00e9lectionner un client",
-            "salle_id": "2025-05-28 08:00:00",
-            "start_date": "2025-05-28 12:30:00",
-            "end_date": "Salle1 - Standard (Capacit\u00e9: 4)"
-        },
-        {
-            "id": "d4135641-a1b4-46ba-91f8-b924013ee310",
+            "id": "c69f8af0-96a7-415b-8f3e-8b39e73de3de",
             "client_id": "{'id': 1, 'nom': 'Ceren', 'prenom': 'Muhammed', 'email': 'misndf@outlook.fr'}",
-            "salle_id": "2025-05-29 10:00:00",
-            "start_date": "2025-05-29 15:00:00",
-            "end_date": "Salle1 - Standard (Capacit\u00e9: 4)"
+            "salle_id": "sda - Conf\u00e9rence (Capacit\u00e9: 5)",
+            "start_date": "2025-05-29 10:15:00",
+            "end_date": "2025-05-29 12:00:00",
+            "duration": "1:45:00"
         },
         {
-            "id": "88b44108-3a19-49d9-ba9f-bb0334d2e85e",
+            "id": "63a74263-49e5-4db5-aaad-e4b8497dba5d",
+            "client_id": "{'id': 2, 'nom': 'asd', 'prenom': 'ad', 'email': 'a@gmail.com'}",
+            "salle_id": "Salle1 - Standard (Capacit\u00e9: 4)",
+            "start_date": "2025-05-29 09:00:00",
+            "end_date": "2025-05-29 13:00:00",
+            "duration": "4:00:00"
+        },
+        {
+            "id": "6ca85a6a-d664-4c9c-9406-ec367ec11892",
             "client_id": "{'id': 1, 'nom': 'Ceren', 'prenom': 'Muhammed', 'email': 'misndf@outlook.fr'}",
-            "salle_id": "2025-05-29 10:00:00",
-            "start_date": "2025-05-29 17:15:00",
-            "end_date": "Salle1 - Standard (Capacit\u00e9: 4)"
+            "salle_id": "Salle1 - Standard (Capacit\u00e9: 4)",
+            "start_date": "2025-05-29 11:30:00",
+            "end_date": "2025-05-29 14:45:00",
+            "duration": "3:15:00"
         }
     ]
 }

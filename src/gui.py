@@ -12,6 +12,7 @@ from main import (
     display_clients,
     book_room,
     display_available_rooms_for_niche,
+    parse_salle_info,
     display_clients_bookings,
     load_data,
     save_data,
@@ -551,16 +552,12 @@ def create_booking_section() -> None:
         if room_menu.get() == "":
             error_room.config(text="Veuillez sélectionner une room.")
             return
-        book_room(
-            entry_client.get(),
-            entry_start_date.get(),
-            entry_end_date.get(),
-            room_var.get(),
-        )
+        
         """Get the client name, start date, end date, and duration."""
         cliient_name = entry_client.get()
         start_date = entry_start_date.get()
         end_date = entry_end_date.get()
+        
         """Calculate the duration of the reservation."""
         try:
             d1 = datetime.strptime(start_date, "%Y-%m-%d %H:%M:%S")
@@ -568,6 +565,16 @@ def create_booking_section() -> None:
             duration = str(d2 - d1)
         except Exception:
             duration = "Inconnue"
+        
+        """Check if the client is selected."""
+        book_room(
+            entry_client.get(),
+            room_var.get(),
+            entry_start_date.get(),
+            entry_end_date.get(),
+            duration,
+        )
+        
         """Get the selected room information."""
         room_info = room_var.get()
         if room_info:
@@ -882,17 +889,10 @@ def display_rooms_lists() -> None:
     ttk.Button(
         button_frame,
         text="Retour",
-        command=menu_principal,  # Retourne au menu principal
+        command=menu_principal,  # Return to the main menu
         style="Secondary.TButton",
         width=20,
     ).pack(side=tk.LEFT, padx=10)
-
-
-def display_clients() -> list:
-    """Returns the list of clients from the JSON file."""
-    with open("data.json", "r") as file:
-        data = json.load(file)
-    return data.get("clients", [])
 
 
 def display_client_list() -> None:
@@ -1069,7 +1069,7 @@ def display_clients_bookings_gui() -> None:
                 return
 
             """ Create headers for the bookings table"""
-            headers = ["Booking ID", "Room", "Start Date", "End Date"]
+            headers = ["Salle", "Type", "Capacité", "Début", "Fin", "Durée"]
             for col, header in enumerate(headers):
                 ttk.Label(
                     results_frame,
@@ -1079,26 +1079,39 @@ def display_clients_bookings_gui() -> None:
                     relief="solid",
                     anchor="center",
                     background="#d3d3d3",
-                    width=20,
+                    width=12,
                 ).grid(row=0, column=col, sticky="nsew")
 
             for row, booking in enumerate(bookings, start=1):
+                salle, type_salle, capacite = parse_salle_info(booking["salle_id"])
+    
                 ttk.Label(
                     results_frame,
-                    text=booking["id"],
+                        text=salle,
                     borderwidth=1,
                     relief="solid",
                     anchor="center",
                     background="#ffffff",
                 ).grid(row=row, column=0, sticky="nsew")
+
                 ttk.Label(
                     results_frame,
-                    text=booking["salle_id"],
+                    text=type_salle,
                     borderwidth=1,
                     relief="solid",
                     anchor="center",
                     background="#ffffff",
                 ).grid(row=row, column=1, sticky="nsew")
+
+                ttk.Label(
+                    results_frame,
+                    text=capacite,
+                    borderwidth=1,
+                    relief="solid",
+                    anchor="center",
+                    background="#ffffff",
+                ).grid(row=row, column=2, sticky="nsew")
+
                 ttk.Label(
                     results_frame,
                     text=booking["start_date"],
@@ -1106,7 +1119,8 @@ def display_clients_bookings_gui() -> None:
                     relief="solid",
                     anchor="center",
                     background="#ffffff",
-                ).grid(row=row, column=2, sticky="nsew")
+                ).grid(row=row, column=3, sticky="nsew")
+
                 ttk.Label(
                     results_frame,
                     text=booking["end_date"],
@@ -1114,7 +1128,16 @@ def display_clients_bookings_gui() -> None:
                     relief="solid",
                     anchor="center",
                     background="#ffffff",
-                ).grid(row=row, column=3, sticky="nsew")
+                ).grid(row=row, column=4, sticky="nsew")
+
+                ttk.Label(
+                    results_frame,
+                    text=booking.get("duration", ""),
+                    borderwidth=1,
+                    relief="solid",
+                    anchor="center",
+                    background="#ffffff",
+                ).grid(row=row, column=5, sticky="nsew")
 
         except Exception as e:
             ttk.Label(
