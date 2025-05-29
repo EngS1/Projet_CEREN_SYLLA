@@ -455,8 +455,8 @@ def create_booking_section() -> None:
         start_date_obj = datetime.strptime(start_date_str, "%Y-%m-%d %H:%M:%S")
 
         end_date_obj = datetime.strptime(end_date_str, "%Y-%m-%d %H:%M:%S")
-        start_date = start_date_obj.strftime("%Y-%m-%d")
-        end_date = end_date_obj.strftime("%Y-%m-%d")
+        start_date = datetime(start_date_obj.year, start_date_obj.month, start_date_obj.day)
+        end_date = datetime(end_date_obj.year, end_date_obj.month, end_date_obj.day)
         start_hour = start_date_obj.strftime("%H:%M")
         end_hour = end_date_obj.strftime("%H:%M")
 
@@ -503,7 +503,7 @@ def create_booking_section() -> None:
             return
 
         """Load available rooms for the selected date and time."""
-        rooms = display_available_rooms_for_niche(start_date, end_date)
+        rooms = display_available_rooms_for_niche(start_date_obj, end_date_obj)
         room_menu["values"] = [
             f"{room['id']} - {room['type']} (Capacité: {room['capacite']})"
             for room in rooms

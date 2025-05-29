@@ -2,6 +2,7 @@ import uuid
 import json
 from datetime import datetime
 from email_validator import validate_email, EmailNotValidError
+from datetime import datetime
 import re
 
 
@@ -74,18 +75,38 @@ def display_clients_bookings(client_id) -> list:
 
 """Show all bookings for a room"""
 
-
 def check_room_availability(salle_id, start_date, end_date) -> bool:
-    """Check if a room is available for a given time slot."""
     for res in bookings:
-        if res["salle_id"] == salle_id and not (
-            end_date <= res["start_date"] or start_date >= res["end_date"]
-        ):
-            return False
+        # Extract the ID
+        booked_salle_id = res["salle_id"].split(" - ")[0]
+        if booked_salle_id == salle_id:
+            res_start = datetime.strptime(res["start_date"], "%Y-%m-%d %H:%M:%S")
+            res_end = datetime.strptime(res["end_date"], "%Y-%m-%d %H:%M:%S")
+
+            print(f"Booking: {res_start} - {res_end}, Requested: {start_date} - {end_date}")
+
+            if not (end_date <= res_start or start_date >= res_end):
+                print(f"Overlap detected! {res['salle_id'] }not available.")
+                return False
     return True
 
 
+
+"""Show available rooms for a specific time slot"""
+
+
+def display_available_rooms_for_niche(start_date, end_date) -> list:
+    """Return a list of available rooms for a specific time slot."""
+    rooms_available = []
+    for salle in rooms:
+        if check_room_availability(salle["id"], start_date, end_date):
+            rooms_available.append(salle)
+    return rooms_available
+
+
+
 """Parse room information from a string"""
+
 
 def parse_salle_info(salle_str):
     try:
@@ -96,18 +117,6 @@ def parse_salle_info(salle_str):
     except Exception:
         salle = type_salle = capacite = ""
     return salle, type_salle, capacite
-
-
-"""Show available rooms for a specific time slot"""
-
-
-def display_available_rooms_for_niche(start_date, end_date) -> list:
-    """Return a list of available rooms for a specific time slot."""
-    rooms_disponibles = []
-    for salle in rooms:
-        if check_room_availability(salle["id"], start_date, end_date):
-            rooms_disponibles.append(salle)
-    return rooms_disponibles
 
 
 """Delete a reservation"""
