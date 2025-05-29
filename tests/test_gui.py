@@ -6,8 +6,8 @@ from src.gui import menu_principal
 class TestGUI(unittest.TestCase):
     def setUp(self):
         """Set up the GUI for testing."""
-        self.root = Tk()  # Initialisez root avant d'appeler menu_principal
-        menu_principal(self.root)  # Passez root comme argument
+        self.root = Tk()
+        menu_principal(self.root)
 
     def tearDown(self):
         """Destroy the GUI after testing."""

@@ -1,5 +1,5 @@
 import unittest
-from src.controller import load_available_rooms  # Exemple de fonction à tester
+from src.controller import load_available_rooms
 
 
 class TestController(unittest.TestCase):
@@ -8,9 +8,7 @@ class TestController(unittest.TestCase):
         start_date = "2025-05-28 10:00:00"
         end_date = "2025-05-28 12:00:00"
         rooms = load_available_rooms(start_date, end_date)
-        self.assertIsInstance(
-            rooms, list
-        )  # Vérifiez que la fonction retourne une liste
+        self.assertIsInstance(rooms, list)
 
 
 if __name__ == "__main__":

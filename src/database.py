@@ -16,5 +16,5 @@ def ecrire_bdd(donnees: dict) -> None:
 
 def get_clients() -> list:
     """Retrieve the list of clients from the database."""
-    data = lire_bdd()  # Utilise la fonction `lire_bdd` pour lire les données
+    data = lire_bdd()
     return data.get("clients", [])
