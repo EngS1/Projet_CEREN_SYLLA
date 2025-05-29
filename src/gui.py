@@ -18,7 +18,6 @@ from main import (
     save_data,
     check_email,
 )
-import json
 import logging
 
 
