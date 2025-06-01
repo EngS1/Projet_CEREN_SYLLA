@@ -8,9 +8,9 @@ version = "1.0.0"
 description = "Application pour gérer les réservations de rooms"
 authors = [{name = "CEREN/ SYLLA", email = "daoudesylla@gmail.com"}]
 dependencies = [
-    "tkcalendar",  # Widget calendrier pour tkinter
+    "tkcalendar",
     "pytest==6.2.4",
-    
+    "email-validator",
 ]
 [project.scripts]
 lancer_application = "src.gui:main"

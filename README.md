@@ -49,6 +49,7 @@ Avant de commencer, assurez-vous d'avoir les éléments suivants installés sur 
    - `tkinter` (inclus par défaut avec Python)
    - `tkcalendar`
    - `logging`
+   - `email_validator`
 
 ---
 
@@ -70,7 +71,7 @@ Avant de commencer, assurez-vous d'avoir les éléments suivants installés sur 
 
 1. Exécutez l'application :
    ```bash
-   python src/main.py
+   python src/gui.py
    ```
    ou:
 
