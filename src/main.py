@@ -2,7 +2,6 @@ import uuid
 import json
 from datetime import datetime
 from email_validator import validate_email, EmailNotValidError
-from datetime import datetime
 import re
 
 
@@ -83,10 +82,8 @@ def check_room_availability(salle_id, start_date, end_date) -> bool:
             res_start = datetime.strptime(res["start_date"], "%Y-%m-%d %H:%M:%S")
             res_end = datetime.strptime(res["end_date"], "%Y-%m-%d %H:%M:%S")
 
-            print(f"Booking: {res_start} - {res_end}, Requested: {start_date} - {end_date}")
 
             if not (end_date <= res_start or start_date >= res_end):
-                print(f"Overlap detected! {res['salle_id'] }not available.")
                 return False
     return True
 
